@@ -17,7 +17,7 @@ final class SwiftPacketProcessorTests: XCTestCase {
         var returnString: String?
 
         struct NewlinePacket: SwiftStringPacket {
-            static func getPacket(context: PPFrameContext, data: String) -> (packet: NewlinePacket, countInPacket: Int)? {
+            static func getPacket(context: SwiftPacketContext, data: String) -> (packet: NewlinePacket, countInPacket: Int)? {
                 guard let newlineIndex = data.firstIndex(of: "\n") else {
                     return nil
                 }
@@ -45,7 +45,7 @@ final class SwiftPacketProcessorTests: XCTestCase {
         struct NewlineFrame: SwiftPacket {
             typealias CollectionType = String
 
-            static func getPacket(context: PPFrameContext, data: String) -> (packet: NewlineFrame, countInPacket: Int)? {
+            static func getPacket(context: SwiftPacketContext, data: String) -> (packet: NewlineFrame, countInPacket: Int)? {
 
 //                let indexOfNewline = data.indexOf(character: "\n")
                 return nil
