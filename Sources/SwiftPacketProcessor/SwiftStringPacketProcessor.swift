@@ -68,11 +68,16 @@ public class SwiftStringPacketProcessor {
         self.process()
     }
 
+    private func pop(count: Int) {
+        self.unprocessedData.removeFirst(count)
+    }
+
     private func process() {
         for (packetTypeWrapper,handlerWrappers) in handlers {
             guard let packetInfo = packetTypeWrapper.packetType.getPacket(context: SwiftPacketContext(), data: self.unprocessedData) else {
                 continue
             }
+            self.pop(count: packetInfo.countInPacket)
 
             for handlerWrapper in handlerWrappers {
                 handlerWrapper.handler(packetInfo.packet)
