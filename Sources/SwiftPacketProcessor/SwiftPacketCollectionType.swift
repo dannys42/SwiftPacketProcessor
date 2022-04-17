@@ -11,16 +11,22 @@ public protocol SwiftPacketCollectionType {
     init()
     var count: Int { get }
     mutating func _packetAppend(_ other: Self)
-    mutating func _packetAppend(data: Data)
-    mutating func _packetAppend(string: String)
+    mutating func _packetRemoveFirst(_ count: Int)
+//    mutating func _packetAppend(data: Data)
+//    mutating func _packetAppend(string: String)
 
 }
 
 extension Data: SwiftPacketCollectionType {
-    mutating public func _packetAppend(_ other: Data) {
+    mutating public func _packetAppend(_ other: Self) {
+//        let dataToAppend = other as! Data
+//        self.append(dataToAppend)
         self.append(other)
     }
-
+    mutating public func _packetRemoveFirst(_ count: Int) {
+        self.removeFirst(count)
+    }
+/*
     mutating public func _packetAppend(data: Data) {
         self.append(data)
     }
@@ -28,13 +34,18 @@ extension Data: SwiftPacketCollectionType {
     mutating public func _packetAppend(string: String) {
         self.append(string.data(using: .utf8)!)
     }
+ */
 }
 
 extension String: SwiftPacketCollectionType {
     mutating public func _packetAppend(_ other: String) {
         self.append(other)
     }
+    mutating public func _packetRemoveFirst(_ count: Int) {
+        self.removeFirst(count)
+    }
 
+    /*
     mutating public func _packetAppend(data: Data) {
         self.append(String(data: data, encoding: .utf8)!)
     }
@@ -42,4 +53,5 @@ extension String: SwiftPacketCollectionType {
     mutating public func _packetAppend(string: String) {
         self.append(string)
     }
+*/
 }

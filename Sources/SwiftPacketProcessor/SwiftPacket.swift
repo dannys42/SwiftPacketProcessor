@@ -1,5 +1,6 @@
 import Foundation
 
+/*
 public protocol AnySwiftPacket {
 
 }
@@ -16,6 +17,7 @@ public protocol SwiftPacket: AnySwiftPacket {
 extension SwiftPacket {
 
 }
+ */
 
 /*
 func f() {

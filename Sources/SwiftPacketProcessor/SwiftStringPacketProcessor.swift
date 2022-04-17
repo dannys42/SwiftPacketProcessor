@@ -7,9 +7,12 @@
 
 import Foundation
 
-public protocol SwiftStringPacket {
-
+public protocol SwiftAnyPacket {
     static var _packetTypeId: UUID { get }
+
+}
+
+public protocol SwiftStringPacket: SwiftAnyPacket {
     static func getPacket(context: SwiftPacketContext, data: String) -> (packet: Self, countInPacket: Int)?
 }
 
