@@ -1,5 +1,5 @@
 //
-//  SwiftPacketProcessor.swift
+//  SwiftStringPacket.swift
 //
 //
 //  Created by Danny Sung on 04/12/2022.
@@ -9,12 +9,12 @@ import Foundation
 
 public protocol SwiftStringPacket {
 
+    static var _packetTypeId: UUID { get }
     static func getPacket(context: SwiftPacketContext, data: String) -> (packet: Self, countInPacket: Int)?
 }
 
 public class SwiftStringPacketProcessor {
     private var unprocessedData: String
-    typealias PacketTypeName = String
 
     struct PacketTypeWrapper: Hashable {
         static func == (lhs: SwiftStringPacketProcessor.PacketTypeWrapper, rhs: SwiftStringPacketProcessor.PacketTypeWrapper) -> Bool {
@@ -22,6 +22,7 @@ public class SwiftStringPacketProcessor {
         }
         func hash(into hasher: inout Hasher) {
             hasher.combine("\(self.packetType)")
+            hasher.combine(self.packetType._packetTypeId)
         }
 
         let packetType: SwiftStringPacket.Type
