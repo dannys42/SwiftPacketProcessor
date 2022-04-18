@@ -7,11 +7,6 @@
 
 import Foundation
 
-public protocol SwiftAnyPacket {
-    static var _packetTypeId: UUID { get }
-
-}
-
 public protocol SwiftStringPacket: SwiftAnyPacket {
     static func getPacket(context: SwiftPacketContext, data: String) -> (packet: Self, countInPacket: Int)?
 }
@@ -19,28 +14,7 @@ public protocol SwiftStringPacket: SwiftAnyPacket {
 public class SwiftStringPacketProcessor {
     private var unprocessedData: String
 
-    struct PacketTypeWrapper: Hashable {
-        static func == (lhs: SwiftStringPacketProcessor.PacketTypeWrapper, rhs: SwiftStringPacketProcessor.PacketTypeWrapper) -> Bool {
-            lhs.packetType == rhs.packetType
-        }
-        func hash(into hasher: inout Hasher) {
-            hasher.combine("\(self.packetType)")
-            hasher.combine(self.packetType._packetTypeId)
-        }
-
-        let packetType: SwiftStringPacket.Type
-        init(_ packetType: SwiftStringPacket.Type) {
-            self.packetType = packetType
-        }
-    }
-    struct HandlerWrapper {
-        let handler: (SwiftStringPacket)->Void
-
-        init(_ handler: @escaping (SwiftStringPacket)->Void) {
-            self.handler = handler
-        }
-    }
-    private var handlers: [PacketTypeWrapper:[HandlerWrapper]]
+    private var handlers: [PacketTypeWrapper:[StringHandlerWrapper]]
 
     public init() {
         self.unprocessedData = ""
@@ -48,7 +22,7 @@ public class SwiftStringPacketProcessor {
     }
 
     public func add<P: SwiftStringPacket>(_ type: P.Type, _ handler: @escaping (P)->Void) {
-        let handlerWrapper = HandlerWrapper { genericPacket in
+        let handlerWrapper = StringHandlerWrapper { genericPacket in
             let packet = genericPacket as! P
             handler(packet)
         }
@@ -57,7 +31,7 @@ public class SwiftStringPacketProcessor {
         self.add(handler: handlerWrapper, for: packetTypeWrapper)
     }
 
-    private func add(handler: HandlerWrapper, for packetType: PacketTypeWrapper) {
+    private func add(handler: StringHandlerWrapper, for packetType: PacketTypeWrapper) {
         if var handlerForPacket = self.handlers[packetType] {
             handlerForPacket.append(handler)
             self.handlers[packetType] = handlerForPacket
@@ -78,7 +52,8 @@ public class SwiftStringPacketProcessor {
 
     private func process() {
         for (packetTypeWrapper,handlerWrappers) in handlers {
-            guard let packetInfo = packetTypeWrapper.packetType.getPacket(context: SwiftPacketContext(), data: self.unprocessedData) else {
+            let packetType = packetTypeWrapper.packetType as! SwiftStringPacket.Type
+            guard let packetInfo = packetType.getPacket(context: SwiftPacketContext(), data: self.unprocessedData) else {
                 continue
             }
             self.pop(count: packetInfo.countInPacket)
