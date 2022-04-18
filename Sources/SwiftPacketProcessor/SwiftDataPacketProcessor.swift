@@ -7,20 +7,14 @@
 
 import Foundation
 
-public protocol SwiftDataPacket: SwiftAnyPacket {
+public protocol SwiftDataPacket: SwiftPacket {
+    
     static func getPacket(context: SwiftPacketContext, data: Data) -> (packet: Self, countInPacket: Int)?
 }
 
 public class SwiftDataPacketProcessor {
     private var unprocessedData: Data
 
-    struct HandlerWrapper {
-        let handler: (SwiftDataPacket)->Void
-
-        init(_ handler: @escaping (SwiftDataPacket)->Void) {
-            self.handler = handler
-        }
-    }
     private var handlers: [PacketTypeWrapper:[DataHandlerWrapper]]
 
     public init() {

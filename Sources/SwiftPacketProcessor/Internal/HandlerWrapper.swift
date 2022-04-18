@@ -8,6 +8,9 @@
 import Foundation
 
 internal protocol AnyHandlerWrapper {
+}
+
+internal protocol HandlerWrapper: AnyHandlerWrapper {
     associatedtype SwiftPacketType
 
     var handler: (SwiftPacketType)->Void { get }
@@ -15,7 +18,7 @@ internal protocol AnyHandlerWrapper {
     init(_ handler: @escaping (SwiftPacketType)->Void)
 }
 
-internal struct DataHandlerWrapper: AnyHandlerWrapper {
+internal struct DataHandlerWrapper: HandlerWrapper {
     let handler: (SwiftDataPacket)->Void
 
     init(_ handler: @escaping (SwiftDataPacket)->Void) {
@@ -23,7 +26,7 @@ internal struct DataHandlerWrapper: AnyHandlerWrapper {
     }
 }
 
-internal struct StringHandlerWrapper: AnyHandlerWrapper {
+internal struct StringHandlerWrapper: HandlerWrapper {
     let handler: (SwiftStringPacket)->Void
 
     init(_ handler: @escaping (SwiftStringPacket)->Void) {
