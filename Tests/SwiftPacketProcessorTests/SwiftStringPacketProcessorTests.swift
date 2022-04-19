@@ -15,7 +15,9 @@ class SwiftStringPacketProcessorTests: XCTestCase {
     }
 
 
-    struct NewlinePacket: SwiftStringPacket {
+    struct NewlinePacket: SPPStringPacket {
+        typealias CollectionType = String
+
         static var _packetTypeId = UUID()
 
         static func getPacket(context: SwiftPacketContext, data: String) -> (packet: NewlinePacket, countInPacket: Int)? {
@@ -30,10 +32,10 @@ class SwiftStringPacketProcessorTests: XCTestCase {
 
         var payload: String
     }
-    var stringProcessor = SwiftStringPacketProcessor()
+    var stringProcessor = PacketProcessor<String>()
 
     override func setUpWithError() throws {
-        self.stringProcessor = SwiftStringPacketProcessor()
+        self.stringProcessor = PacketProcessor<String>()
         // Put setup code here. This method is called before the invocation of each test method in the class.
     }
 
@@ -125,5 +127,4 @@ class SwiftStringPacketProcessorTests: XCTestCase {
         self.wait(for: [expectation], timeout: Timeouts.successTimeout.rawValue)
         XCTAssertEqual(observedValue, expectedValue)
     }
-
 }

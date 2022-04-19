@@ -18,6 +18,7 @@ internal protocol HandlerWrapper: AnyHandlerWrapper {
     init(_ handler: @escaping (SwiftPacketType)->Void)
 }
 
+/*
 internal struct DataHandlerWrapper: HandlerWrapper {
     let handler: (SwiftDataPacket)->Void
 
@@ -33,3 +34,4 @@ internal struct StringHandlerWrapper: HandlerWrapper {
         self.handler = handler
     }
 }
+*/

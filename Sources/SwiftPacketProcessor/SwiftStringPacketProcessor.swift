@@ -6,7 +6,7 @@
 //
 
 import Foundation
-
+/*
 public protocol SwiftStringPacket: SwiftAnyPacket {
     
     static func getPacket(context: SwiftPacketContext, data: String) -> (packet: Self, countInPacket: Int)?
@@ -65,3 +65,5 @@ public class SwiftStringPacketProcessor {
         }
     }
 }
+
+*/

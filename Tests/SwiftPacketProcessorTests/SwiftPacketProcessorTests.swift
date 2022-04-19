@@ -4,7 +4,7 @@ import XCTest
 
 final class SwiftPacketProcessorTests: XCTestCase {
     func testExample() throws {
-//        let p = PacketProcessor<Data, SPPDataPacket>()
+        let p = PacketProcessor<Data>()
 
        /*
         // This is an example of a functional test case.

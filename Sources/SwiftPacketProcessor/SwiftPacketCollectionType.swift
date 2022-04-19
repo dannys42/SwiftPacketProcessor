@@ -13,14 +13,14 @@ public protocol SwiftPacketCollectionType {
     mutating func _packetAppend(_ other: Self)
     mutating func _packetRemoveFirst(_ count: Int)
 
-    associatedtype _packetType
+//    associatedtype _packetType
 //    mutating func _packetAppend(data: Data)
 //    mutating func _packetAppend(string: String)
 
 }
 
 extension Data: SwiftPacketCollectionType {
-    public typealias _packetType = SwiftDataPacket
+//    public typealias _packetType = SwiftDataPacket
 
     mutating public func _packetAppend(_ other: Self) {
 //        let dataToAppend = other as! Data
@@ -42,7 +42,7 @@ extension Data: SwiftPacketCollectionType {
 }
 
 extension String: SwiftPacketCollectionType {
-    public typealias _packetType = SwiftStringPacket
+//    public typealias _packetType = SwiftStringPacket
 
     mutating public func _packetAppend(_ other: String) {
         self.append(other)
