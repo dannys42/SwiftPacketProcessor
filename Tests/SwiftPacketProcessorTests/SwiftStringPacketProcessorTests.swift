@@ -15,7 +15,7 @@ class SwiftStringPacketProcessorTests: XCTestCase {
     }
 
 
-    struct NewlinePacket: SPPStringPacket {
+    struct NewlinePacket: StringPacket {
         typealias CollectionType = String
 
         static var _packetTypeId = UUID()
