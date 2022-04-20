@@ -17,12 +17,6 @@ public protocol SPPPacket: SPPAnyPacket {
     static func getPacket(context: SwiftPacketContext, data: CollectionType) -> (packet: Self, countInPacket: Int)?
 }
 
-/*
-public protocol SPPPacket: SPPAnyPacket {
-    static func getPacket<CollectionType: SwiftPacketCollectionType>(context: SwiftPacketContext, data: CollectionType) -> (packet: Self, countInPacket: Int)?
-}
- */
-
 public protocol SPPDataPacket: SPPPacket where CollectionType == Data {
     static func getPacket(context: SwiftPacketContext, data: Data) -> (packet: Self, countInPacket: Int)?
 }
@@ -32,33 +26,6 @@ public protocol SPPStringPacket: SPPPacket where CollectionType == String {
 }
 
 
-/*
-public protocol SPPDataPacket: SPPPacket where CollectionType == Data {
-    static func getPacket(context: SwiftPacketContext, data: Data) -> (packet: Self, countInPacket: Int)?
-}
-
-public protocol SPPStringPacket: SPPPacket where CollectionType == String {
-    static func getPacket(context: SwiftPacketContext, data: String) -> (packet: Self, countInPacket: Int)?
-}
- */
-
-/*
-extension SPPPacket {
-    func _packetWrapped() -> SPPHandlerWrapper {
-    }
-}
- */
-
-/*
-
-internal protocol SPPHandlerWrapper {
-    associatedtype SwiftPacketType
-
-    var handler: (SwiftPacketType)->Void { get }
-
-    init(_ handler: @escaping (SwiftPacketType)->Void)
-}
- */
 
 struct SPPHandlerWrapper {
     var handler: (SPPAnyPacket)->Void
@@ -87,7 +54,6 @@ internal struct SPPPacketTypeWrapper<CollectionType: SwiftPacketCollectionType>:
 
 }
 
-//public class PacketProcessor<CollectionType: SwiftPacketCollectionType, PacketType: SPPPacket> where PacketType.CollectionType == CollectionType {
 public class PacketProcessor<CollectionType: SwiftPacketCollectionType> {
 
     private var unprocessedData: CollectionType
@@ -138,14 +104,6 @@ public class PacketProcessor<CollectionType: SwiftPacketCollectionType> {
 
     private func process() {
         for (packetTypeWrapper,handlerWrappers) in handlers {
-//            let packetType = packetTypeWrapper.packetType as! PacketType.Type
-//            let packetType = packetTypeWrapper.packetType
-
-            /*
-            guard let packetInfo = packetType.getPacket(context: SwiftPacketContext(), data: self.unprocessedData) else {
-                continue
-            }
-             */
             guard let packetInfo = packetTypeWrapper.packetGenerator(SwiftPacketContext(), self.unprocessedData) else {
                 continue
             }
