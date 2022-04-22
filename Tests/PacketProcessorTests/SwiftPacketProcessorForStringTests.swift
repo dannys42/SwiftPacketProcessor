@@ -7,7 +7,7 @@
 
 import Foundation
 import XCTest
-@testable import SwiftPacketProcessor
+@testable import PacketProcessor
 
 /*
 class SwiftPacketProcessorForStringTests: XCTestCase {

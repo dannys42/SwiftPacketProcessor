@@ -1,6 +1,6 @@
 import Foundation
 import XCTest
-@testable import SwiftPacketProcessor
+@testable import PacketProcessor
 
 final class DataPacketProcessorTests: XCTestCase {
     var dataProcessor = PacketProcessor<Data>()

@@ -6,7 +6,7 @@
 //
 
 import XCTest
-@testable import SwiftPacketProcessor
+@testable import PacketProcessor
 
 class StringPacketProcessorTests: XCTestCase {
     enum Timeouts: TimeInterval {

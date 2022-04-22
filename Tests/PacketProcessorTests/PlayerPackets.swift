@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SwiftPacketProcessor
+import PacketProcessor
 
 /* The following packets follow this structure:
 
