@@ -1,5 +1,5 @@
 //
-//  SwiftStringPacketProcessorTests.swift
+//  StringPacketProcessorTests.swift
 //  
 //
 //  Created by Danny Sung on 04/15/2022.
@@ -8,7 +8,7 @@
 import XCTest
 @testable import SwiftPacketProcessor
 
-class SwiftStringPacketProcessorTests: XCTestCase {
+class StringPacketProcessorTests: XCTestCase {
     enum Timeouts: TimeInterval {
         case successTimeout = 2
         case failureTimeout = 1
