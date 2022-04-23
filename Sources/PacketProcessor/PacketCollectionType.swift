@@ -7,28 +7,21 @@
 
 import Foundation
 
+/// Protocol used to declare data collection types that can be used by `PacketProcessor`.
+///
+/// Most users can ignore this protocol.
 public protocol PacketCollectionType {
+
     init()
+
+    /// Number of elements in the collection.
     var count: Int { get }
+
+    /// Called when adding more data to the buffer.
+    /// - Parameter other: Additional data to add.
     mutating func _packetProcessor_packetAppend(_ other: Self)
+
+    /// Called when removing data from the buffer.
+    /// - Parameter count: Number of elements to remove.  (bytes for Data; characters for String)
     mutating func _packetProcessor_packetRemoveFirst(_ count: Int)
-}
-
-extension Data: PacketCollectionType {
-
-    mutating public func _packetProcessor_packetAppend(_ other: Self) {
-        self.append(other)
-    }
-    mutating public func _packetProcessor_packetRemoveFirst(_ count: Int) {
-        self.removeFirst(count)
-    }
-}
-
-extension String: PacketCollectionType {
-    mutating public func _packetProcessor_packetAppend(_ other: String) {
-        self.append(other)
-    }
-    mutating public func _packetProcessor_packetRemoveFirst(_ count: Int) {
-        self.removeFirst(count)
-    }
 }

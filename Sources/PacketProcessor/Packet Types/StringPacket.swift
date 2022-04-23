@@ -1,0 +1,23 @@
+//
+//  StringPacket.swift
+//  
+//
+//  Created by Danny Sung on 04/21/2022.
+//
+
+import Foundation
+
+/// Packets that are fundamentally string-oriented should conform to `StringPacket`.
+public protocol StringPacket: Packet where CollectionType == String {
+    static func getPacket(context: SwiftPacketContext, data: String) -> (packet: Self, countInPacket: Int)?
+}
+
+/// Declare `String` is a valid `PacketCollectionType`
+extension String: PacketCollectionType {
+    mutating public func _packetProcessor_packetAppend(_ other: String) {
+        self.append(other)
+    }
+    mutating public func _packetProcessor_packetRemoveFirst(_ count: Int) {
+        self.removeFirst(count)
+    }
+}

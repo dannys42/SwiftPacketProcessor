@@ -8,6 +8,14 @@
 import Foundation
 
 
+/// Provides a simple, type-safe way of handling structured packets given a data stream.
+///
+/// `PacketProcessor` handles the details of buffer management when reading a data stream.  Callers need only push newly received data to the `PacketProcessor`.  The correct handlers for the appropriately typed packet will be called when appropriate.
+///
+/// Packet definitions must include rules for validating the packet and returning the number of data elements consumed by the packet. See `DataPacket` and `StringPacket`.
+///
+/// Streams can have a base collection type of `String` or `Data` by initializing as `PacketProcessor<String>` or `PacketProcessor<Data>`.
+///
 public class PacketProcessor<CollectionType: PacketCollectionType> {
 
     private var unprocessedData: CollectionType
@@ -18,6 +26,14 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
         self.handlers = [:]
     }
 
+    /// Add a packet handler for a specific packet type.
+    ///
+    /// - Parameters:
+    ///   - packetType: The packet type to process.  (e.g. `MyPacket.self`)
+    ///   - handler: a handler that will be called every time `packetType` is found.
+    ///
+    /// - Note: If multiple handlers are added for the same packet type, each handler will receive the packet.
+    ///
     public func add<P: Packet>(_ packetType: P.Type, _ handler: @escaping (P)->Void) where P.CollectionType == CollectionType {
 
         let handlerWrapper = HandlerWrapper { genericPacket in
@@ -46,6 +62,8 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
         }
     }
 
+    /// Call this when more data in the stream is received.
+    /// - Parameter data: The new data received
     public func push(_ data: CollectionType) {
         self.unprocessedData._packetProcessor_packetAppend(data)
         self.process()
