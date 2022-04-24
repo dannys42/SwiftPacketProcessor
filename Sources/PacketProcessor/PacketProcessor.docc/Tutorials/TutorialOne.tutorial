@@ -2,27 +2,23 @@
     @Intro(title: "TutorialOne Title ") {
         Some text
         
-<!--        @Image(source: <#file#>, alt: "<#accessible description#>")-->
     }
     
     @Section(title: "First thing!") {
         @ContentAndMedia {
             something?
             
-<!--            @Image(source: <#file#>, alt: "<#accessible description#>")-->
         }
         
         @Steps {
             @Step {
                 Step 1
                 
-<!--                @Image(source: <#file#>, alt: "<#accessible description#>")-->
             }
             
             @Step {
                 Sstep 2 
                 
-                @Code(name: "<#display name#>", file: <#filename.swift#>)
             }
         }
     }

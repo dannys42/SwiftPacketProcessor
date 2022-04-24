@@ -7,7 +7,8 @@
 
 import Foundation
 
-/// Packets that are fundamentally byte-oriented should conform to `DataPacket`.
+/// Byte-oriented packets should conform to `DataPacket`.
+/// Examples of this include IP, TCP, and UDP.
 public protocol DataPacket: Packet where CollectionType == Data {
     static func getPacket(context: SwiftPacketContext, data: Data) -> (packet: Self, countInPacket: Int)?
 }

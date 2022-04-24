@@ -1,3 +1,10 @@
+/*
+See LICENSE folder for this sample’s licensing information.
+
+Abstract:
+Defines a new PacketProcessor to convert data streams to type-safe packets.
+*/
+
 //
 //  PacketProcessor.swift
 //  
@@ -32,7 +39,13 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
     ///   - packetType: The packet type to process.  (e.g. `MyPacket.self`)
     ///   - handler: a handler that will be called every time `packetType` is found.
     ///
-    /// - Note: If multiple handlers are added for the same packet type, each handler will receive the packet.
+    /// This is typically called like:
+    ///  ```swift
+    ///  add(MyPacketType.self) { packet in ...
+    ///  }
+    /// ```
+    ///
+    /// - Note: It is safe to register multiple handlers of the same type.  Each handler each handler will receive the packet.
     ///
     public func add<P: Packet>(_ packetType: P.Type, _ handler: @escaping (P)->Void) where P.CollectionType == CollectionType {
 
@@ -52,7 +65,32 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
         self.add(handler: handlerWrapper, for: packetTypeWrapper)
 
     }
-    
+
+    /// Call this when more data in the stream is received.
+    /// - Parameter data: The new data received
+    ///
+    /// For `Data` types:
+    /// ```swift
+    ///     let packetProcessor = PacketProcessor<Data>()
+    ///     let newData = Data([ ... ]) // incoming data stream
+    ///     packetProcessor.push(newData)
+    /// ```
+    ///
+    /// For `String` types:
+    /// ```swift
+    ///     let packetProcessor = PacketProcessor<String>()
+    ///     let newData = "..." // incoming data stream
+    ///     packetProcessor.push(newData)
+    /// ```
+    ///
+    public func push(_ data: CollectionType) {
+        self.unprocessedData._packetProcessor_packetAppend(data)
+        self.process()
+    }
+
+
+    // MARK: - Private methods
+
     private func add(handler: HandlerWrapper, for packetType: PacketTypeWrapper<CollectionType>) {
         if var handlerForPacket = self.handlers[packetType] {
             handlerForPacket.append(handler)
@@ -60,13 +98,6 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
         } else {
             self.handlers[packetType] = [handler]
         }
-    }
-
-    /// Call this when more data in the stream is received.
-    /// - Parameter data: The new data received
-    public func push(_ data: CollectionType) {
-        self.unprocessedData._packetProcessor_packetAppend(data)
-        self.process()
     }
 
     private func pop(count: Int) {
