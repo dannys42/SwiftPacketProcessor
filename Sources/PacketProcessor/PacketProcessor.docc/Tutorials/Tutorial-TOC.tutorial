@@ -1,0 +1,15 @@
+@Tutorials(name: "Tutorials") {
+    @Intro(title: "String Oriented Packets") {
+       ``PacketProcessor`` can help you to easily convert a stream of characters to structured data packets.
+        
+<!--        @Image(source: <#file#>, alt: "<#accessible description#>")-->
+    }
+    
+    @Chapter(name: "Reading log files") {
+       This example demonstrates how we might read from a log file.
+        
+<!--        @Image(source: <#file#>, alt: "<#accessible description#>")-->
+        
+        @TutorialReference(tutorial: "doc:StringPacket-Logfile")
+    }
+}

@@ -1,0 +1,39 @@
+@Tutorial(time: 3) {
+    @Intro(title: "Line oriented String Packets") {
+        A simple variable-length packet for reading lines of text (e.g. from log files)
+        
+<!--        @Image(source: <#file#>, alt: "<#accessible description#>")-->
+    }
+    
+    @Section(title: "Define the Packet") {
+        @ContentAndMedia {
+           foo 
+            
+<!--            @Image(source: <#file#>, alt: "<#accessible description#>")-->
+        }
+        
+
+        @Steps {
+            
+            @Step {
+               blah 
+               
+               let's do something...
+                
+                @Code(name: "test.swift", file: "stringpacket-logfile-01-01") {
+                    what goes here?
+                }
+                
+<!--                @Image(source: <#file#>, alt: "<#accessible description#>")-->
+            }
+            
+            @Step {
+               argh 
+               
+               what about now?
+                
+<!--                @Code(name: "<#display name#>", file: <#filename.swift#>)-->
+            }
+        }
+    }
+}

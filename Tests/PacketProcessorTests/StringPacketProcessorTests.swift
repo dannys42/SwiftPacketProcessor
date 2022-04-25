@@ -16,8 +16,6 @@ class StringPacketProcessorTests: XCTestCase {
 
 
     struct NewlinePacket: StringPacket {
-        typealias CollectionType = String
-
         static var _packetTypeId = UUID()
 
         static func getPacket(context: SwiftPacketContext, data: String) -> (packet: NewlinePacket, countInPacket: Int)? {
