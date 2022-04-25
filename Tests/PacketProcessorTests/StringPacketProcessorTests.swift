@@ -18,14 +18,14 @@ class StringPacketProcessorTests: XCTestCase {
     struct NewlinePacket: StringPacket {
         static var _packetTypeId = UUID()
 
-        static func findFirstPacket(context: SwiftPacketContext, data: String) -> (packet: NewlinePacket, countInPacket: Int)? {
+        static func findFirstPacket(context: SwiftPacketContext, data: String) -> PacketSearchResult<Self>? {
             guard let newlineIndex = data.firstIndex(of: "\n") else {
                 return nil
             }
 
             let payload = data.prefix(upTo: newlineIndex)
             let packet = NewlinePacket(payload: String(payload))
-            return (packet, payload.count+1)
+            return PacketSearchResult(packet: packet, numberOfElementsConsumedByPacket: payload.count+1)
         }
 
         var payload: String

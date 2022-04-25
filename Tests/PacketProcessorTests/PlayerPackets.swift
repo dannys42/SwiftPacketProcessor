@@ -122,14 +122,14 @@ struct PlayerMovement: DataPacket, Equatable {
 
     static var _packetTypeId = UUID()
 
-    static func findFirstPacket(context: SwiftPacketContext, data: Data) -> (packet: PlayerMovement, countInPacket: Int)? {
+    static func findFirstPacket(context: SwiftPacketContext, data: Data) -> PacketSearchResult<Self>? {
         guard let packet = Packet(packetType: PacketType.movement.rawValue, payloadLength: 2, payload: data) else {
             return nil
         }
         let playerMovement = PlayerMovement(playerId: Int(packet.payload[0]),
                                             direction: Direction(rawValue: Int(packet.payload[1]))!)
 
-        return (playerMovement, 4+2) // 4-byte header + 2-byte payload
+        return PacketSearchResult(packet: playerMovement, numberOfElementsConsumedByPacket:  4+2) // 4-byte header + 2-byte payload
     }
 }
 
@@ -167,7 +167,7 @@ struct PlayerAttack: DataPacket, Equatable {
 
     static var _packetTypeId = UUID()
 
-    static func findFirstPacket(context: SwiftPacketContext, data: Data) -> (packet: PlayerAttack, countInPacket: Int)? {
+    static func findFirstPacket(context: SwiftPacketContext, data: Data) -> PacketSearchResult<Self>? {
         guard let packet = Packet(packetType: PacketType.movement.rawValue, payloadLength: 2, payload: data) else {
             return nil
         }
@@ -176,6 +176,7 @@ struct PlayerAttack: DataPacket, Equatable {
                                           weaponId: Int(packet.payload[1])
         )
 
-        return (playerAttack, 4+3) // 4-byte header + 2-byte payload
+        return PacketSearchResult(packet: playerAttack,
+                                  numberOfElementsConsumedByPacket: 4+3) // 4-byte header + 3-byte payload
     }
 }
