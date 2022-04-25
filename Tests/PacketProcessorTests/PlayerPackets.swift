@@ -122,7 +122,7 @@ struct PlayerMovement: DataPacket, Equatable {
 
     static var _packetTypeId = UUID()
 
-    static func getPacket(context: SwiftPacketContext, data: Data) -> (packet: PlayerMovement, countInPacket: Int)? {
+    static func findFirstPacket(context: SwiftPacketContext, data: Data) -> (packet: PlayerMovement, countInPacket: Int)? {
         guard let packet = Packet(packetType: PacketType.movement.rawValue, payloadLength: 2, payload: data) else {
             return nil
         }
@@ -167,7 +167,7 @@ struct PlayerAttack: DataPacket, Equatable {
 
     static var _packetTypeId = UUID()
 
-    static func getPacket(context: SwiftPacketContext, data: Data) -> (packet: PlayerAttack, countInPacket: Int)? {
+    static func findFirstPacket(context: SwiftPacketContext, data: Data) -> (packet: PlayerAttack, countInPacket: Int)? {
         guard let packet = Packet(packetType: PacketType.movement.rawValue, payloadLength: 2, payload: data) else {
             return nil
         }

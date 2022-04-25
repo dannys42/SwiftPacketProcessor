@@ -16,7 +16,7 @@ struct NewlinePacket: StringPacket {
 
     static var _packetTypeId = UUID()
 
-    static func getPacket(context: SwiftPacketContext, data: String) -> (packet: NewlinePacket, countInPacket: Int)? {
+    static func findFirstPacket(context: SwiftPacketContext, data: String) -> (packet: NewlinePacket, countInPacket: Int)? {
         guard let newlineIndex = data.firstIndex(of: "\n") else {
             return nil
         }

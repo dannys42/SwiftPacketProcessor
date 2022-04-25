@@ -31,7 +31,7 @@ final class DataPacketProcessorTests: XCTestCase {
         let expectedValue = inputValue
 
         let packetData = inputValue.toData()
-        guard let processedMovement = PlayerMovement.getPacket(context: SwiftPacketContext(), data: packetData) else {
+        guard let processedMovement = PlayerMovement.findFirstPacket(context: SwiftPacketContext(), data: packetData) else {
             XCTFail("Did not find a valid packet!")
             return
         }

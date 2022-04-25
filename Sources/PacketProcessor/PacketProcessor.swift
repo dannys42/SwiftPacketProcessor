@@ -54,7 +54,7 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
             handler(packet)
         }
         let packetTypeWrapper = PacketTypeWrapper<CollectionType>(P.self) { context, data -> (AnyPacket, Int)? in
-            guard let (packet, count) = P.getPacket(context: context, data: data) else {
+            guard let (packet, count) = P.findFirstPacket(context: context, data: data) else {
                 return nil
             }
 

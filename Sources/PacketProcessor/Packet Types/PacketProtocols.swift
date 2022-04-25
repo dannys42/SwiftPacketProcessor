@@ -18,6 +18,6 @@ public protocol AnyPacket {
 public protocol Packet: AnyPacket {
     associatedtype CollectionType
 
-    static func getPacket(context: SwiftPacketContext, data: CollectionType) -> (packet: Self, countInPacket: Int)?
+    static func findFirstPacket(context: SwiftPacketContext, data: CollectionType) -> (packet: Self, countInPacket: Int)?
 }
 

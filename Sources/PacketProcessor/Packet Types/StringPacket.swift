@@ -10,7 +10,7 @@ import Foundation
 /// String-oriented packets should conform to `StringPacket`.
 /// Examples include SMTP, IRC, XMPP.
 public protocol StringPacket: Packet where CollectionType == String {
-    static func getPacket(context: SwiftPacketContext, data: String) -> (packet: Self, countInPacket: Int)?
+    static func findFirstPacket(context: SwiftPacketContext, data: String) -> (packet: Self, countInPacket: Int)?
 }
 
 /// Declare `String` is a valid `PacketCollectionType`
