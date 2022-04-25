@@ -15,6 +15,17 @@ final class DataPacketProcessorTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
+    func testThat_DifferentPacketTypes_Have_DiffernetPacketIDs() throws {
+        XCTAssertNotEqual(PlayerMovement._packetTypeId, PlayerAttack._packetTypeId)
+    }
+
+    func testThat_PacketId_Is_Static() throws {
+        let packetId1 = PlayerMovement._packetTypeId
+        let packetId2 = PlayerMovement._packetTypeId
+
+        XCTAssertEqual(packetId1, packetId2)
+    }
+
     func testThat_GeneratedMovement_isEqualTo_ParsedMovement() throws {
         let inputValue = PlayerMovement(playerId: 0x23, direction: .East)
         let expectedValue = inputValue

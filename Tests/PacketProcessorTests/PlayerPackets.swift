@@ -129,6 +129,53 @@ struct PlayerMovement: DataPacket, Equatable {
         let playerMovement = PlayerMovement(playerId: Int(packet.payload[0]),
                                             direction: Direction(rawValue: Int(packet.payload[1]))!)
 
-        return (playerMovement, 2+4) // 4-byte header + 2-byte payload
+        return (playerMovement, 4+2) // 4-byte header + 2-byte payload
+    }
+}
+
+// Attack packets are:
+// packetType = 0x02
+// 1 byte playerId
+// 1 byte direction
+// 1 byte weaponId
+struct PlayerAttack: DataPacket, Equatable {
+    enum Direction: Int {
+        case North = 1
+        case East  = 2
+        case South = 3
+        case West  = 4
+    }
+    let playerId: Int
+    let direction: Direction
+    let weaponId: Int
+
+    static let MagicNumber = 0x02
+
+    func toData() -> Data {
+        var payload = Data()
+        payload.append(contentsOf: [
+            UInt8(self.playerId),
+            UInt8(self.direction.rawValue),
+            UInt8(self.weaponId),
+        ])
+
+        let packet = Packet(type: Self.MagicNumber, payload: payload)
+        return packet.toData()
+    }
+
+    // DataPacket conformance
+
+    static var _packetTypeId = UUID()
+
+    static func getPacket(context: SwiftPacketContext, data: Data) -> (packet: PlayerAttack, countInPacket: Int)? {
+        guard let packet = Packet(packetType: PacketType.movement.rawValue, payloadLength: 2, payload: data) else {
+            return nil
+        }
+        let playerAttack = PlayerAttack(playerId: Int(packet.payload[0]),
+                                          direction: Direction(rawValue: Int(packet.payload[1]))!,
+                                          weaponId: Int(packet.payload[1])
+        )
+
+        return (playerAttack, 4+3) // 4-byte header + 2-byte payload
     }
 }
