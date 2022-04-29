@@ -24,11 +24,11 @@ class StringPacketProcessorTests: XCTestCase {
             }
 
             let payload = data.prefix(upTo: newlineIndex)
-            let packet = NewlinePacket(payload: String(payload))
+            let packet = NewlinePacket(text: String(payload))
             return PacketSearchResult(packet: packet, numberOfElementsConsumedByPacket: payload.count+1)
         }
 
-        var payload: String
+        var text: String
     }
     var stringProcessor = PacketProcessor<String>()
 
@@ -61,7 +61,7 @@ class StringPacketProcessorTests: XCTestCase {
         var observedValue: String?
 
         stringProcessor.addHandler(NewlinePacket.self) { p in
-            observedValue = p.payload
+            observedValue = p.text
             expectation.fulfill()
         }
         stringProcessor.push("Hello")
@@ -88,7 +88,7 @@ class StringPacketProcessorTests: XCTestCase {
         stringProcessor.addHandler(NewlinePacket.self) { packet in
             defer { waitGroup.leave() }
 
-            observed.add("1. " + packet.payload)
+            observed.add("1. " + packet.text)
             print("  handler 1 done")
         }
 
@@ -96,7 +96,7 @@ class StringPacketProcessorTests: XCTestCase {
         stringProcessor.addHandler(NewlinePacket.self) { packet in
             defer { waitGroup.leave() }
 
-            observed.add("2. " + packet.payload)
+            observed.add("2. " + packet.text)
             print("  handler 2 done")
         }
         stringProcessor.push("Hello")
@@ -140,7 +140,7 @@ class StringPacketProcessorTests: XCTestCase {
 
         stringProcessor.addHandler(NewlinePacket.self) { p in
             defer { g.leave() }
-            state.addString(p.payload)
+            state.addString(p.text)
         }
 
         g.enter()
