@@ -186,10 +186,13 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
     }
 
     /// Mark the end of input.  It is an error to call ``push(_:)`` after declaring end.
+    ///
+    /// This will give all packet handlers another chance to process the packet (with `isEnded = true` in the `PacketContext`.  It will also clear the `PacketProcessor`'s internal data buffers.
     public func end() {
         self.isEnded = true
         if self.unprocessedData.count > 0 {
             self.processAllPackets()
+            self.unprocessedData = .init()
         }
     }
 
