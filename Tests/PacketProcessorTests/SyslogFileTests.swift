@@ -98,7 +98,6 @@ class SyslogFilePacketProcessorTests: XCTestCase {
 
     func feedPacketProcessor() {
         let bufferSize = Int( (1...1000).randomElement()! )
-//        let bufferSize = 10000
         print("Feeding packet processor with buffer size: \(bufferSize) elements")
         var inputBuffer = self.logConents
         while inputBuffer.count > 0 {

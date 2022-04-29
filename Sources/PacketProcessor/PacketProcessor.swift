@@ -17,8 +17,6 @@ import Foundation
 public
 class PacketSequenceIterator<P: AnyPacket>: AsyncSequence, AsyncIteratorProtocol {
     public typealias Element = P
-//    private var nextElement: P?
-//    private var semaphore: DispatchSemaphore
     private var isCancelled = false
     actor Coordinator {
         private var isCancelled = false
@@ -48,13 +46,10 @@ class PacketSequenceIterator<P: AnyPacket>: AsyncSequence, AsyncIteratorProtocol
     private var coordinator: Coordinator
 
     init(type: P.Type) {
-//        self.semaphore = DispatchSemaphore(value: 0)
         self.coordinator = Coordinator()
     }
 
     deinit {
-//        self.isCancelled = true
-//        self.semaphore.signal()
         Task {
             await self.coordinator.cancel()
         }
@@ -63,30 +58,10 @@ class PacketSequenceIterator<P: AnyPacket>: AsyncSequence, AsyncIteratorProtocol
 
     func push(_ value: P) async {
         await self.coordinator.push(value)
-//        self.nextElement = value
-//        self.semaphore.signal()
     }
 
     public func next() async throws -> Element? {
         return try await self.coordinator.next()
-        /*
-        return withCheckedContinuation { continuation in
-            self.semaphore.wait()
-            if self.isCancelled {
-                continuation.resume(returning: nil)
-                return
-            }
-
-            let nextElement = self.nextElement
-            self.nextElement = nil
-            continuation.resume(returning: nextElement)
-        }
-//        let u = URL(string: "https://www.google.com/")!
-//        for try await x in u.lines {
-
-//        }
-//       return nil
-         */
     }
 
     nonisolated public func makeAsyncIterator() -> PacketSequenceIterator {
@@ -107,7 +82,6 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
 
     private var unprocessedData: CollectionType
     private var handlers: [PacketTypeWrapper<CollectionType>:[HandlerWrapper]]
-//    private var handlerQueue: DispatchQueue
 
     public init() {
         self.unprocessedData = CollectionType()
@@ -220,18 +194,23 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
 
     private func pop(count: Int) {
         self.unprocessedData._packetProcessor_packetRemoveFirst(count)
-        self.processAllPackets()
     }
 
     private func processAllPackets() {
-        self.processSinglePacket()
+        var didPopBuffer: Bool
+        repeat {
+            didPopBuffer = self.processSinglePacket()
+        } while didPopBuffer
     }
 
-    private func processSinglePacket() {
-        for (packetTypeWrapper,handlerWrappers) in self.handlers {
+    private func processSinglePacket() -> Bool {
+        var didPopBuffer = false
+
+        for (packetTypeWrapper, handlerWrappers) in self.handlers {
             guard let packetInfo = packetTypeWrapper.packetGenerator(SwiftPacketContext(), self.unprocessedData) else {
                 continue
             }
+            didPopBuffer = true
             self.pop(count: packetInfo.count)
 
             for handlerWrapper in handlerWrappers {
@@ -239,6 +218,8 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
             }
 
         }
+
+        return didPopBuffer
     }
 
 }
