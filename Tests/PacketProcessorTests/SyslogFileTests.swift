@@ -89,64 +89,29 @@ class SyslogFilePacketProcessorTests: XCTestCase {
         static var _packetTypeId = UUID()
     }
 
-    override func setUp() async throws {
+    override func setUp() {
         self.packetProcessor = PacketProcessor<String>()
     }
 
-    override func tearDown() async throws {
+    override func tearDown() {
     }
 
     func feedPacketProcessor() {
-        let bufferSize = Int( (1...100).randomElement()! )
+        let bufferSize = Int( (1...1000).randomElement()! )
+//        let bufferSize = 10000
         print("Feeding packet processor with buffer size: \(bufferSize) elements")
         var inputBuffer = self.logConents
         while inputBuffer.count > 0 {
             let firstBlock = String(inputBuffer.prefix(bufferSize))
-            print("read a block (\(firstBlock.count)): \(firstBlock.replacingOccurrences(of: "\n", with: "\\n"))")
+//            print("read a block (\(firstBlock.count)): \(firstBlock.replacingOccurrences(of: "\n", with: "\\n"))")
 
             self.packetProcessor.push(firstBlock)
             inputBuffer.removeFirst(firstBlock.count)
         }
     }
 
-    func testThat_FirstLine_MatchesExpectation() throws {
-        self.packetProcessor.addHandler(SyslogPacket.self) { packet in
-            print("found: \(packet)")
-        }
-
-        self.feedPacketProcessor()
-
-//        Mar  1 03:37:35 myserver rsyslogd: [origin software="rsyslogd" swVersion="5.8.10" x-pid="14251" x-info="http://www.rsyslog.com"] rsyslogd was HUPed
-
-    }
-
-    class PacketObserver<ReturnValue: Any>: Operation {
-        public private(set) var value: ReturnValue!
-        var error: Error?
-        let packetProcessor: PacketProcessor<String>
-        let block: () async throws -> ReturnValue
-
-        init(packetProcessor: PacketProcessor<String>, block: @escaping () async throws -> ReturnValue) {
-            self.packetProcessor = packetProcessor
-            self.block = block
-        }
-
-        override func main() {
-            let g = DispatchGroup()
-            g.enter()
-            Task {
-                defer { g.leave() }
-                do {
-                    self.value = try await self.block()
-                } catch {
-                    self.error = error
-                }
-            }
-            g.wait()
-        }
-    }
-
-    func testThat_FirstLine_MatchesExpectation_WithAsyncSequence() async throws {
+    func expectedFirstPacket() -> SyslogPacket {
+        // Expected Line: Mar  1 03:37:35 myserver rsyslogd: [origin software="rsyslogd" swVersion="5.8.10" x-pid="14251" x-info="http://www.rsyslog.com"] rsyslogd was HUPed
         var expectedDateComponents = DateComponents()
         expectedDateComponents.month = 2 // Mar
         expectedDateComponents.day = 1
@@ -156,14 +121,48 @@ class SyslogFilePacketProcessorTests: XCTestCase {
         expectedDateComponents.second = 35
         let expectedDate = Calendar.current.date(from: expectedDateComponents)!
 
-        // Expected Line: Mar  1 03:37:35 myserver rsyslogd: [origin software="rsyslogd" swVersion="5.8.10" x-pid="14251" x-info="http://www.rsyslog.com"] rsyslogd was HUPed
-        let expectedValue = SyslogPacket(date: expectedDate, server: "myserver", component: "rsyslogd", message: "[origin software=\"rsyslogd\" swVersion=\"5.8.10\" x-pid=\"14251\" x-info=\"http://www.rsyslog.com\"] rsyslogd was HUPed")
+        return SyslogPacket(date: expectedDate, server: "myserver", component: "rsyslogd", message: "[origin software=\"rsyslogd\" swVersion=\"5.8.10\" x-pid=\"14251\" x-info=\"http://www.rsyslog.com\"] rsyslogd was HUPed")
+    }
+
+    func expectedLastPacket() -> SyslogPacket {
+        // Expected Line: Apr 25 16:54:12 myserver sshd[7191]: pam_unix(sshd:session): session opened for user root by (uid=0)
+
+        var expectedDateComponents = DateComponents()
+        expectedDateComponents.month = 3 // Apr
+        expectedDateComponents.day = 25
+        expectedDateComponents.year = Date().year
+        expectedDateComponents.hour = 16
+        expectedDateComponents.minute = 54
+        expectedDateComponents.second = 12
+        let expectedDate = Calendar.current.date(from: expectedDateComponents)!
+
+        return SyslogPacket(date: expectedDate, server: "myserver", component: "sshd[7191]", message: "pam_unix(sshd:session): session opened for user root by (uid=0)")
+    }
+
+    func testThat_FirstLine_IsCorrect() async throws {
+        let expectedValue = self.expectedFirstPacket()
         var observedValue: SyslogPacket?
 
         self.packetProcessor.addHandler(SyslogPacket.self) { handlerId, packet in
             observedValue = packet
-            print("got a syslog packet: \(packet)")
             self.packetProcessor.remove(handlerId: handlerId)
+        }
+
+        self.feedPacketProcessor()
+        XCTAssertEqual(expectedValue, observedValue)
+    }
+
+    func testThat_LastLine_IsCorrect() throws {
+        let expectedValue = self.expectedLastPacket()
+        var observedValue: SyslogPacket?
+        var packetCount = 0
+
+        self.packetProcessor.addHandler(SyslogPacket.self) { handlerId, packet in
+            defer { packetCount += 1 }
+            if packetCount == 8 {
+                observedValue = packet
+                self.packetProcessor.remove(handlerId: handlerId)
+            }
         }
 
         self.feedPacketProcessor()
@@ -175,8 +174,9 @@ class SyslogFilePacketProcessorTests: XCTestCase {
         let observedValue: Int
         var count = 0
 
+        // Ensure input is what we expect
         let lines = self.logConents.split(separator: "\n")
-        print("line count: \(lines.count)")
+        XCTAssertEqual(lines.count, expectedValue)
 
         self.packetProcessor.addHandler(SyslogPacket.self) { _ in
             count += 1
@@ -185,6 +185,7 @@ class SyslogFilePacketProcessorTests: XCTestCase {
 
         observedValue = count
 
+        // Ensure output is what we expect
         XCTAssertEqual(expectedValue, observedValue)
     }
     
