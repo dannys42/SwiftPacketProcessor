@@ -132,41 +132,21 @@ class SyslogFilePacketProcessorTests: XCTestCase {
         }
 
         override func main() {
+            let g = DispatchGroup()
+            g.enter()
             Task {
+                defer { g.leave() }
                 do {
                     self.value = try await self.block()
                 } catch {
                     self.error = error
                 }
             }
-
+            g.wait()
         }
     }
 
     func testThat_FirstLine_MatchesExpectation_WithAsyncSequence() async throws {
-//        class Observed: Operation {
-//            var value: SyslogPacket?
-//            var error: Error?
-//            let packetProcessor: PacketProcessor<String>
-//
-//            init(packetProcessor: PacketProcessor<String>) {
-//                self.packetProcessor = packetProcessor
-//            }
-//
-//            override func main() {
-//                Task {
-//                    do {
-//                        for try await packet in self.packetProcessor.handle(SyslogPacket.self) {
-//                            self.value = packet
-//                            break
-//                        }
-//                    } catch {
-//                        self.error = error
-//                    }
-//                }
-//
-//            }
-//        }
         var expectedDateComponents = DateComponents()
         expectedDateComponents.month = 2 // Mar
         expectedDateComponents.day = 1
@@ -178,45 +158,32 @@ class SyslogFilePacketProcessorTests: XCTestCase {
 
         // Expected Line: Mar  1 03:37:35 myserver rsyslogd: [origin software="rsyslogd" swVersion="5.8.10" x-pid="14251" x-info="http://www.rsyslog.com"] rsyslogd was HUPed
         let expectedValue = SyslogPacket(date: expectedDate, server: "myserver", component: "rsyslogd", message: "[origin software=\"rsyslogd\" swVersion=\"5.8.10\" x-pid=\"14251\" x-info=\"http://www.rsyslog.com\"] rsyslogd was HUPed")
-//        let observed = Observed(packetProcessor: self.packetProcessor)
+        var observedValue: SyslogPacket?
 
-        // Place observer in it's own operation queue because we're going to feed into the packet processor after the handler is setup
-        let opQ = OperationQueue()
-        let observer = PacketObserver<SyslogPacket?>(packetProcessor: self.packetProcessor) {
-            for try await packet in self.packetProcessor.handle(SyslogPacket.self) {
-                return packet
-            }
-            return nil
+        self.packetProcessor.addHandler(SyslogPacket.self) { handlerId, packet in
+            observedValue = packet
+            print("got a syslog packet: \(packet)")
+            self.packetProcessor.remove(handlerId: handlerId)
         }
-        opQ.addOperation(observer)
 
         self.feedPacketProcessor()
-
-        opQ.waitUntilAllOperationsAreFinished()
-
-        XCTAssertEqual(expectedValue, observer.value!)
+        XCTAssertEqual(expectedValue, observedValue)
     }
 
     func testThat_NumberOfPackets_IsCorrect() {
         let expectedValue = 9
         let observedValue: Int
+        var count = 0
 
         let lines = self.logConents.split(separator: "\n")
         print("line count: \(lines.count)")
 
-        let opQ = OperationQueue()
-        let observer = PacketObserver<Int>(packetProcessor: self.packetProcessor) {
-            var count = 0
-            for try await _ in self.packetProcessor.handle(SyslogPacket.self) {
-                count += 1
-            }
-            return count
+        self.packetProcessor.addHandler(SyslogPacket.self) { _ in
+            count += 1
         }
-        opQ.addOperation(observer)
         self.feedPacketProcessor()
 
-        opQ.waitUntilAllOperationsAreFinished()
-        observedValue = observer.value
+        observedValue = count
 
         XCTAssertEqual(expectedValue, observedValue)
     }

@@ -107,10 +107,9 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
 
     private var unprocessedData: CollectionType
     private var handlers: [PacketTypeWrapper<CollectionType>:[HandlerWrapper]]
-    private var handlerQueue: DispatchQueue
+//    private var handlerQueue: DispatchQueue
 
     public init() {
-        self.handlerQueue = DispatchQueue(label: "PacketProcessor serialQ \(CollectionType.self)")
         self.unprocessedData = CollectionType()
         self.handlers = [:]
     }
@@ -130,11 +129,11 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
     /// - Note: It is safe to register multiple handlers of the same type.  Each handler each handler will receive the packet.
     /// - Returns: An identifier that can be used to remove the handler
     @discardableResult
-    public func addHandler<P: Packet>(_ packetType: P.Type, _ handler: @escaping (PacketHandlerIdentifier,P) async ->Void) -> PacketHandlerIdentifier where P.CollectionType == CollectionType {
+    public func addHandler<P: Packet>(_ packetType: P.Type, _ handler: @escaping (PacketHandlerIdentifier,P) ->Void) -> PacketHandlerIdentifier where P.CollectionType == CollectionType {
 
         let handlerWrapper = HandlerWrapper { handlerId, genericPacket in
             let packet = genericPacket as! P
-            await handler(handlerId, packet)
+            handler(handlerId, packet)
         }
         let packetTypeWrapper = PacketTypeWrapper<CollectionType>(P.self) { context, data -> (AnyPacket, Int)? in
             guard let searchResult = P.findFirstPacket(context: context, data: data) else {
@@ -143,7 +142,6 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
 
             return (searchResult.packet as AnyPacket, searchResult.numberOfElementsConsumedByPacket)
         }
-
 
         self.add(handler: handlerWrapper, for: packetTypeWrapper)
 
@@ -156,19 +154,20 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
     ///   - handler: a handler that will be called every time `packetType` is found.
     /// - Returns: An identifier that can be used to remove the handler
     @discardableResult
-    public func addHandler<P: Packet>(_ packetType: P.Type, _ handler: @escaping (P) async ->Void) -> PacketHandlerIdentifier where P.CollectionType == CollectionType {
+    public func addHandler<P: Packet>(_ packetType: P.Type, _ handler: @escaping (P) ->Void) -> PacketHandlerIdentifier where P.CollectionType == CollectionType {
 
-        self.addHandler(packetType) { _, packet in
-            await handler(packet)
+        return self.addHandler(packetType) { _, packet in
+            handler(packet)
         }
-
     }
 
     public func handle<P: Packet>(_ packetType: P.Type) -> PacketSequenceIterator<P> where P.CollectionType == CollectionType {
         let iterator = PacketSequenceIterator(type: P.self)
 
         self.addHandler(P.self) { handlerId, packet in
-            await iterator.push(packet)
+            Task {
+                await iterator.push(packet)
+            }
         }
 
         return iterator
@@ -196,6 +195,17 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
         self.processAllPackets()
     }
 
+    public func remove(handlerId: PacketHandlerIdentifier) {
+        var newHandlers: [PacketTypeWrapper<CollectionType>:[HandlerWrapper]] = [:]
+        for (packetType, handlerList) in self.handlers {
+
+            let newHandlerList = handlerList.filter { $0.id != handlerId }
+            if !newHandlerList.isEmpty {
+                newHandlers[packetType] = newHandlerList
+            }
+        }
+        self.handlers = newHandlers
+    }
 
     // MARK: - Private methods
 
@@ -214,12 +224,10 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
     }
 
     private func processAllPackets() {
-        Task {
-            await self.processSinglePacket()
-        }
+        self.processSinglePacket()
     }
 
-    private func processSinglePacket() async {
+    private func processSinglePacket() {
         for (packetTypeWrapper,handlerWrappers) in self.handlers {
             guard let packetInfo = packetTypeWrapper.packetGenerator(SwiftPacketContext(), self.unprocessedData) else {
                 continue
@@ -227,7 +235,7 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
             self.pop(count: packetInfo.count)
 
             for handlerWrapper in handlerWrappers {
-                await handlerWrapper.handler(handlerWrapper.id, packetInfo.packet)
+                handlerWrapper.handler(handlerWrapper.id, packetInfo.packet)
             }
 
         }

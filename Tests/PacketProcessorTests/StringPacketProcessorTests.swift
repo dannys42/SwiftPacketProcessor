@@ -93,7 +93,7 @@ class StringPacketProcessorTests: XCTestCase {
     func testThat_MultipleObserversOfSamePacket_WillGetPacket() async throws {
         let expectation = self.expectation(description: "Find a newline.")
         let expectedValue = Set(["1. Hello world!", "2. Hello world!"])
-        actor Observed {
+        class Observed {
             var value = Set<String>()
 
             func add(_ value: String) {
@@ -104,17 +104,19 @@ class StringPacketProcessorTests: XCTestCase {
         let waitGroup = DispatchGroup()
 
         waitGroup.enter()
-        stringProcessor.addHandler(NewlinePacket.self) { p in
+        stringProcessor.addHandler(NewlinePacket.self) { packet in
             defer { waitGroup.leave() }
 
-            await observed.add("1. " + p.payload)
+            observed.add("1. " + packet.payload)
+            print("  handler 1 done")
         }
 
         waitGroup.enter()
-        stringProcessor.addHandler(NewlinePacket.self) { p in
+        stringProcessor.addHandler(NewlinePacket.self) { packet in
             defer { waitGroup.leave() }
 
-            await observed.add("2. " + p.payload)
+            observed.add("2. " + packet.payload)
+            print("  handler 2 done")
         }
         stringProcessor.push("Hello")
         stringProcessor.push(" world!\n")
@@ -123,7 +125,7 @@ class StringPacketProcessorTests: XCTestCase {
             expectation.fulfill()
         }
         self.wait(for: [expectation], timeout: Timeouts.successTimeout.rawValue)
-        let observedValue = await observed.value
+        let observedValue = observed.value
         XCTAssertEqual(expectedValue, observedValue)
     }
 
@@ -131,18 +133,12 @@ class StringPacketProcessorTests: XCTestCase {
         let expectation = self.expectation(description: "Find a newline.")
         let expectedValue = ["0. Hello world!", "1. Goodbye, world."]
 
-//        var count = 0
         let g = DispatchGroup()
         class State {
             let q = DispatchQueue(label: "synchronize test state")
             var count: Int
             var strings: [String]
-//
-//            func getCountAndIncrement() -> Int  {
-//                let value = self.count
-//                self.count += 1
-//                return value
-//            }
+
             init() {
                 self.count = 0
                 self.strings = []
@@ -164,8 +160,6 @@ class StringPacketProcessorTests: XCTestCase {
         stringProcessor.addHandler(NewlinePacket.self) { p in
             defer { g.leave() }
             state.addString(p.payload)
-//            state.increment()
-//            count += 1
         }
 
         g.enter()
