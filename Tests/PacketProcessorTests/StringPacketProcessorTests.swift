@@ -41,25 +41,6 @@ class StringPacketProcessorTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func test_Something() {
-        let g = DispatchGroup()
-        let serialTask = SerialTask()
-
-        g.enter()
-        serialTask.addTask {
-            defer { g.leave() }
-            sleep(1)
-            print("Hello")
-        }
-
-        g.enter()
-        serialTask.addTask {
-            defer { g.leave() }
-            print("Goodbye")
-        }
-        g.wait()
-    }
-
     func testThat_ThereIsNoPacket_WhenNoNewline() throws {
         let g = DispatchGroup()
 
