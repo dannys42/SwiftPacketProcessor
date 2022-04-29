@@ -41,11 +41,30 @@ class StringPacketProcessorTests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
+    func test_Something() {
+        let g = DispatchGroup()
+        let serialTask = SerialTask()
+
+        g.enter()
+        serialTask.addTask {
+            defer { g.leave() }
+            sleep(1)
+            print("Hello")
+        }
+
+        g.enter()
+        serialTask.addTask {
+            defer { g.leave() }
+            print("Goodbye")
+        }
+        g.wait()
+    }
+
     func testThat_ThereIsNoPacket_WhenNoNewline() throws {
         let g = DispatchGroup()
 
         g.enter()
-        stringProcessor.add(NewlinePacket.self) { p in
+        stringProcessor.addHandler(NewlinePacket.self) { p in
             g.leave()
         }
         stringProcessor.push("Hello")
@@ -60,7 +79,7 @@ class StringPacketProcessorTests: XCTestCase {
         let expectedValue = "Hello world!"
         var observedValue: String?
 
-        stringProcessor.add(NewlinePacket.self) { p in
+        stringProcessor.addHandler(NewlinePacket.self) { p in
             observedValue = p.payload
             expectation.fulfill()
         }
@@ -71,47 +90,82 @@ class StringPacketProcessorTests: XCTestCase {
         XCTAssertEqual(observedValue, expectedValue)
     }
 
-    func testThat_MultipleObserversOfSamePacket_WillGetPacket() throws {
+    func testThat_MultipleObserversOfSamePacket_WillGetPacket() async throws {
         let expectation = self.expectation(description: "Find a newline.")
-        let expectedValue = ["1. Hello world!", "2. Hello world!"]
-        var observedValue: [String] = []
-        let g = DispatchGroup()
+        let expectedValue = Set(["1. Hello world!", "2. Hello world!"])
+        actor Observed {
+            var value = Set<String>()
 
-        g.enter()
-        stringProcessor.add(NewlinePacket.self) { p in
-            defer { g.leave() }
+            func add(_ value: String) {
+                self.value.insert(value)
+            }
+        }
+        let observed = Observed()
+        let waitGroup = DispatchGroup()
 
-            observedValue.append("1. " + p.payload)
+        waitGroup.enter()
+        stringProcessor.addHandler(NewlinePacket.self) { p in
+            defer { waitGroup.leave() }
+
+            await observed.add("1. " + p.payload)
         }
 
-        g.enter()
-        stringProcessor.add(NewlinePacket.self) { p in
-            defer { g.leave() }
+        waitGroup.enter()
+        stringProcessor.addHandler(NewlinePacket.self) { p in
+            defer { waitGroup.leave() }
 
-            observedValue.append("2. " + p.payload)
+            await observed.add("2. " + p.payload)
         }
         stringProcessor.push("Hello")
         stringProcessor.push(" world!\n")
 
-        g.notify(queue: .global()) {
+        waitGroup.notify(queue: .global()) {
             expectation.fulfill()
         }
         self.wait(for: [expectation], timeout: Timeouts.successTimeout.rawValue)
-        XCTAssertEqual(observedValue, expectedValue)
+        let observedValue = await observed.value
+        XCTAssertEqual(expectedValue, observedValue)
     }
 
-    func testThat_SuccessiveNewlines_WillGetPackets() throws {
+    func testThat_SuccessiveNewlines_WillGetPackets() async throws {
         let expectation = self.expectation(description: "Find a newline.")
         let expectedValue = ["0. Hello world!", "1. Goodbye, world."]
-        var observedValue: [String] = []
-        var count = 0
+
+//        var count = 0
         let g = DispatchGroup()
+        class State {
+            let q = DispatchQueue(label: "synchronize test state")
+            var count: Int
+            var strings: [String]
+//
+//            func getCountAndIncrement() -> Int  {
+//                let value = self.count
+//                self.count += 1
+//                return value
+//            }
+            init() {
+                self.count = 0
+                self.strings = []
+            }
 
-        stringProcessor.add(NewlinePacket.self) { p in
+            func addString(_ string: String) {
+                q.sync {
+                    self.strings.append("\(self.count). " + string)
+                    self.count += 1
+                }
+            }
+
+            func getStrings() -> [String] {
+                return self.strings
+            }
+        }
+        let state = State()
+
+        stringProcessor.addHandler(NewlinePacket.self) { p in
             defer { g.leave() }
-
-            observedValue.append("\(count). " + p.payload)
-            count += 1
+            state.addString(p.payload)
+//            state.increment()
+//            count += 1
         }
 
         g.enter()
@@ -123,6 +177,7 @@ class StringPacketProcessorTests: XCTestCase {
             expectation.fulfill()
         }
         self.wait(for: [expectation], timeout: Timeouts.successTimeout.rawValue)
+        let observedValue = state.getStrings()
         XCTAssertEqual(observedValue, expectedValue)
     }
 }

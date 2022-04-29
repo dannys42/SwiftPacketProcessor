@@ -41,7 +41,7 @@ final class DataPacketProcessorTests: XCTestCase {
     }
 
     func testExample() throws {
-        self.dataProcessor.add(PlayerMovement.self) { packet in
+        self.dataProcessor.addHandler(PlayerMovement.self) { packet in
             print("got movement packet: \(packet)")
         }
     }

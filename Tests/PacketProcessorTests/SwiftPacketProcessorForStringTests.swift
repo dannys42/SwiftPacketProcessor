@@ -42,7 +42,7 @@ class SwiftPacketProcessorForStringTests: XCTestCase {
         let expectedValue = "Hello world!"
         var observedValue: String?
 
-        stringProcessor.add(NewlinePacket.self) { p in
+        stringProcessor.addHandler(NewlinePacket.self) { p in
             observedValue = p.payload
             expectation.fulfill()
         }
