@@ -7,8 +7,13 @@ A simple log file processor
 Created by Danny Sung on 04/29/2022.
 */
 
-import Foundation
 
-struct NewlinePacket {
-    var text: String
+import Foundation
+import PacketProcessor
+
+class LogReader {
+    let packetProcessor = PacketProcessor<String>()
+
+    init() {
+    }
 }

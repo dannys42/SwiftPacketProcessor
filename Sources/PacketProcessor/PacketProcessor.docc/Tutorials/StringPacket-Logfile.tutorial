@@ -7,7 +7,7 @@
     
     @Section(title: "Define the Packet") {
         @ContentAndMedia {
-           foo 
+           Follow these steps to declare a new packet type.
             
 <!--            @Image(source: <#file#>, alt: "<#accessible description#>")-->
         }
@@ -16,11 +16,11 @@
         @Steps {
             
             @Step {
-               blah 
+               Define the data you'll want to collect from your packet.
                
-               let's do something...
-                
-                @Code(name: "test.swift", file: "stringpacket-logfile-01-01") {
+               For this simple case, we simple want a line of text.
+               
+                @Code(name: "NewlinePacket.swift", file: "stringpacket-logfile-01-01") {
                     what goes here?
                 }
                 
@@ -28,12 +28,54 @@
             }
             
             @Step {
-               argh 
-               
-               what about now?
+                Declare your packet as a ``DataPacket`` if you will be reading byte-streams or a ``StringPacket`` if you will be reading text characters.
                 
-<!--                @Code(name: "<#display name#>", file: <#filename.swift#>)-->
+                Since we're working with text, we'll declare this as a ``StringPacket``.  Add the required static properties.
+                
+                @Code(name: "NewlinePacket.swift", file: "stringpacket-logfile-01-02")
+            }
+            
+            @Step {
+                Now define the rules for how to find the first packet.  *Important*: You must correctly specify the number of characters used to create this packet.
+                
+                In this case, it is the number of characters in the line plus the newline character.
+                
+                @Code(name: "NewlinePacket.swift", file: "stringpacket-logfile-01-03")
             }
         }
     }
+        
+    @Section(title: "Setup the Packet Processor") {
+            @ContentAndMedia {
+                Now we'll initialize a new ``PacketProcessor`` setup the packet handlers.
+            }
+            
+            @Steps {
+                @Step {
+                    Declare a packet processor.
+                    
+                    To process ``StringPacket``s, the ``PacketProcessor`` must be declared with a `String` as the ``PacketCollectionType``.
+                    
+                    @Code(name: "LogReader.swift", file: "stringpacket-logfile-02-01")
+                }
+                
+                @Step {
+                    Next we need to define what to do when we get a complete line. Here, we'll just print it to the console.
+                    
+                    Add a Packet Handler.
+                    
+                    @Code(name: "LogReader.swift", file: "stringpacket-logfile-02-02")
+                }
+                
+                @Step {
+                    Finally, we need a way to receive text.  This may come from a file, socket, etc.  For brevity, the exact mechanism for retrieving text is not shown.
+                    
+                    Note: The text sent to `packetProcessor.push()` can handle any number of characters.  The text may contain 0 or many newlines.  The Packet Handler will be called exactly once for all complete newlines.
+                    
+                    @Code(name: "LogReader.swift", file: "stringpacket-logfile-02-03")
+                }
+                
+            }
+    }
+
 }

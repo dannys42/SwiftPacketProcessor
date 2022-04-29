@@ -16,6 +16,8 @@ class StringPacketProcessorTests: XCTestCase {
 
 
     struct NewlinePacket: StringPacket {
+        var text: String
+
         static var _packetTypeId = UUID()
 
         static func findFirstPacket(context: SwiftPacketContext, data: String) -> PacketSearchResult<Self>? {
@@ -28,7 +30,6 @@ class StringPacketProcessorTests: XCTestCase {
             return PacketSearchResult(packet: packet, numberOfElementsConsumedByPacket: payload.count+1)
         }
 
-        var text: String
     }
     var stringProcessor = PacketProcessor<String>()
 
