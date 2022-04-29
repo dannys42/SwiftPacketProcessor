@@ -82,6 +82,7 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
 
     private var unprocessedData: CollectionType
     private var handlers: [PacketTypeWrapper<CollectionType>:[HandlerWrapper]]
+    private var isEnded = false
 
     public init() {
         self.unprocessedData = CollectionType()
@@ -165,10 +166,13 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
     /// ```
     ///
     public func push(_ data: CollectionType) {
+        assert(!self.isEnded, "Attempting to push() after callign end()")
         self.unprocessedData._packetProcessor_packetAppend(data)
         self.processAllPackets()
     }
 
+    /// Remove a handler
+    /// - Parameter handlerId: ``PacketHandlerIdentifier`` to remove.  This is returned when calling ``addHandler()``
     public func remove(handlerId: PacketHandlerIdentifier) {
         var newHandlers: [PacketTypeWrapper<CollectionType>:[HandlerWrapper]] = [:]
         for (packetType, handlerList) in self.handlers {
@@ -179,6 +183,14 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
             }
         }
         self.handlers = newHandlers
+    }
+
+    /// Mark the end of input.  It is an error to call ``push(_:)`` after declaring end.
+    public func end() {
+        self.isEnded = true
+        if self.unprocessedData.count > 0 {
+            self.processAllPackets()
+        }
     }
 
     // MARK: - Private methods
@@ -206,8 +218,9 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
     private func processSinglePacket() -> Bool {
         var didPopBuffer = false
 
+        let context = PacketContext(isEnded: self.isEnded)
         for (packetTypeWrapper, handlerWrappers) in self.handlers {
-            guard let packetInfo = packetTypeWrapper.packetGenerator(SwiftPacketContext(), self.unprocessedData) else {
+            guard let packetInfo = packetTypeWrapper.packetGenerator(context, self.unprocessedData) else {
                 continue
             }
             didPopBuffer = true

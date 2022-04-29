@@ -22,7 +22,6 @@ class SyslogFilePacketProcessorTests: XCTestCase {
     Mar 29 07:01:01 myserver auditd[941]: Audit daemon rotating log files
     Apr 25 16:54:12 myserver sshd[7191]: Accepted publickey for root from 93.184.216.34 port 42157 ssh2
     Apr 25 16:54:12 myserver sshd[7191]: pam_unix(sshd:session): session opened for user root by (uid=0)
-
     """
 
     var packetProcessor = PacketProcessor<String>()
@@ -33,11 +32,20 @@ class SyslogFilePacketProcessorTests: XCTestCase {
         let component: String
         let message: String
 
-        static func findFirstPacket(context: SwiftPacketContext, data: String) -> PacketSearchResult<SyslogFilePacketProcessorTests.SyslogPacket>? {
+        static func findFirstPacket(context: PacketContext, data: String) -> PacketSearchResult<SyslogFilePacketProcessorTests.SyslogPacket>? {
 
-            // We can ignore packets that do not have a newline as they are incomplete
-            guard let newlineIndex = data.range(of: "\n") else { return nil }
-            let line = data[data.startIndex..<newlineIndex.lowerBound]
+            let line: Substring
+            let newlineLength: Int
+
+            if context.isEnded {
+                line = data[data.startIndex..<data.endIndex]
+                newlineLength = 0
+            } else {
+                // We can ignore packets that do not have a newline as they are incomplete
+                guard let newlineIndex = data.range(of: "\n") else { return nil }
+                line = data[data.startIndex..<newlineIndex.lowerBound]
+                newlineLength = 1
+            }
 
             // If there is no separator, the packet is also incomplete
             guard let separatorIndex = line.range(of: ": ") else { return nil }
@@ -84,7 +92,7 @@ class SyslogFilePacketProcessorTests: XCTestCase {
             let packet = SyslogPacket(date: date, server: host, component: component, message: message)
 
             return PacketSearchResult(packet: packet,
-                                      numberOfElementsConsumedByPacket: line.count+1)
+                                      numberOfElementsConsumedByPacket: line.count+newlineLength)
         }
         static var _packetTypeId = UUID()
     }
@@ -107,6 +115,7 @@ class SyslogFilePacketProcessorTests: XCTestCase {
             self.packetProcessor.push(firstBlock)
             inputBuffer.removeFirst(firstBlock.count)
         }
+        self.packetProcessor.end()
     }
 
     func expectedFirstPacket() -> SyslogPacket {
