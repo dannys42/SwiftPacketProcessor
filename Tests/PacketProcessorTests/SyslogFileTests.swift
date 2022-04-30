@@ -37,14 +37,15 @@ class SyslogFilePacketProcessorTests: XCTestCase {
             let line: Substring
             let newlineLength: Int
 
-            if context.isEnded {
+            if let newlineIndex = data.range(of: "\n") {
+                // We can ignore packets that do not have a newline as they are incomplete
+                line = data[data.startIndex..<newlineIndex.lowerBound]
+                newlineLength = 1
+            } else if context.isEnded {
                 line = data[data.startIndex..<data.endIndex]
                 newlineLength = 0
             } else {
-                // We can ignore packets that do not have a newline as they are incomplete
-                guard let newlineIndex = data.range(of: "\n") else { return nil }
-                line = data[data.startIndex..<newlineIndex.lowerBound]
-                newlineLength = 1
+                return nil
             }
 
             // If there is no separator, the packet is also incomplete

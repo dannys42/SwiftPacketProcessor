@@ -24,7 +24,7 @@ where am i?
 ### Defining Packets
 - ``DataPacket``
 - ``StringPacket``
-- ``SwiftPacketContext``
+- ``PacketContext``
 
 ### Internals
 

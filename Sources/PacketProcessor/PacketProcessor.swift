@@ -148,7 +148,7 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
         return iterator
     }
 
-    /// Call this when more data in the stream is received.
+    /// Call when more data in the stream is received.
     /// - Parameter data: The new data received
     ///
     /// For `Data` types:
@@ -164,6 +164,8 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
     ///     let newData = "..." // incoming data stream
     ///     packetProcessor.push(newData)
     /// ```
+    ///
+    /// Note: Call ``end()`` when no more data is expected (e.g. when the input stream is closed).
     ///
     public func push(_ data: CollectionType) {
         assert(!self.isEnded, "Attempting to push() after callign end()")
@@ -219,6 +221,8 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
     }
 
     private func processSinglePacket() -> Bool {
+        guard self.unprocessedData.count > 0 else { return false }
+
         var didPopBuffer = false
 
         let context = PacketContext(isEnded: self.isEnded)

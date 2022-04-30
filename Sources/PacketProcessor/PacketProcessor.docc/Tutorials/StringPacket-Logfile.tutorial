@@ -28,9 +28,9 @@
             }
             
             @Step {
-                Declare your packet as a ``DataPacket`` if you will be reading byte-streams or a ``StringPacket`` if you will be reading text characters.
+                Declare your packet as a ``PacketProcessor/DataPacket`` if you will be reading byte-streams or a ``PacketProcessor/StringPacket`` if you will be reading text characters.
                 
-                Since we're working with text, we'll declare this as a ``StringPacket``.  Add the required static properties.
+                Since we're working with text, we'll declare this as a ``PacketProcessor/StringPacket``.  Add the required static properties.
                 
                 @Code(name: "NewlinePacket.swift", file: "stringpacket-logfile-01-02")
             }
@@ -54,7 +54,7 @@
                 @Step {
                     Declare a packet processor.
                     
-                    To process ``StringPacket``s, the ``PacketProcessor`` must be declared with a `String` as the ``PacketCollectionType``.
+                    To process ``PacketProcessor/StringPacket``s, the ``PacketProcessor`` must be declared with a `String` as the ``PacketProcessor/PacketCollectionType``.
                     
                     @Code(name: "LogReader.swift", file: "stringpacket-logfile-02-01")
                 }
@@ -62,7 +62,7 @@
                 @Step {
                     Next we need to define what to do when we get a complete line. Here, we'll just print it to the console.
                     
-                    Add a Packet Handler.
+                    Add a Packet Handler with ``PacketProcessor/PacketProcessor/addHandler(_:_:)-86o7r``
                     
                     @Code(name: "LogReader.swift", file: "stringpacket-logfile-02-02")
                 }
@@ -70,11 +70,28 @@
                 @Step {
                     Finally, we need a way to receive text.  This may come from a file, socket, etc.  For brevity, the exact mechanism for retrieving text is not shown.
                     
-                    Note: The text sent to `packetProcessor.push()` can handle any number of characters.  The text may contain 0 or many newlines.  The Packet Handler will be called exactly once for all complete newlines.
+                    Note: The text sent to ``PacketProcessor/PacketProcessor/push(_:)`` can handle any number of characters.  The text may contain 0 or many newlines.  The Packet Handler will be called exactly once for all complete newlines.
                     
                     @Code(name: "LogReader.swift", file: "stringpacket-logfile-02-03")
                 }
                 
+                @Step {
+                    In the case of line handling, we may run into issues where we end the file without a newline.  In this case, we need to inform the ``PacketProcessor`` of this by calling ``PacketProcessor/PacketProcessor/end()``.
+                    
+                    @Code(name: "LogReader.swift", file: "stringpacket-logfile-02-04")
+                }
+                
+                @Step {
+                    Next we go back to our NewlinePacket definition.
+                    
+                    @Code(name: "NewlinePacket.swift", file: "stringpacket-logfile-02-05")
+                }
+                
+                @Step {
+                    To add support for end of file handling, we need to inspect ``PacketProcessor/PacketContext/isEnded`` and accept a packet even if no newline is found.
+                    
+                    @Code(name: "NewlinePacket.swift", file: "stringpacket-logfile-02-06")
+                } 
             }
     }
 

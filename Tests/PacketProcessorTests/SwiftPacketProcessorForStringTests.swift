@@ -14,7 +14,7 @@ class SwiftPacketProcessorForStringTests: XCTestCase {
     struct NewlinePacket: SwiftStringPacket {
         static var _packetTypeId = UUID()
 
-        static func findFirstPacket(context: SwiftPacketContext, data: String) -> (packet: NewlinePacket, countInPacket: Int)? {
+        static func findFirstPacket(context: PacketContext, data: String) -> (packet: NewlinePacket, countInPacket: Int)? {
             guard let newlineIndex = data.firstIndex(of: "\n") else {
                 return nil
             }

@@ -11,9 +11,4 @@ Created by Danny Sung on 04/29/2022.
 import Foundation
 import PacketProcessor
 
-class LogReader {
-    let packetProcessor = PacketProcessor<String>()
-
-    init() {
-    }
-}
+let packetProcessor = PacketProcessor<String>()

@@ -20,3 +20,5 @@ packetProcessor.addHandler(NewlinePacket.self) { packet in
 while let newText = getNewTextFromSomewhere() {
     self.packetProcessor.push(text)
 }
+
+self.packetProcessor.end()

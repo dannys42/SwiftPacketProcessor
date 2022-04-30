@@ -11,12 +11,8 @@ Created by Danny Sung on 04/29/2022.
 import Foundation
 import PacketProcessor
 
-class LogReader {
-    let packetProcessor = PacketProcessor<String>()
+let packetProcessor = PacketProcessor<String>()
 
-    init() {
-        packetProcessor.addHandler(NewlinePacket.self) { packet in
-            print("Found a full line: \(packet.text)")
-        }
-    }
+packetProcessor.addHandler(NewlinePacket.self) { packet in
+    print("Found a full line: \(packet.text)")
 }

@@ -17,13 +17,23 @@ struct NewlinePacket: StringPacket {
     static var _packetTypeId = UUID()
 
     static func findFirstPacket(context: PacketContext, data: String) -> PacketSearchResult<Self>? {
-        guard let newlineIndex = data.firstIndex(of: "\n") else {
+
+        let endOfLineIndex: String.Index
+        let newlineCount: Int
+
+        if let newlineIndex = data.firstIndex(of: "\n") {
+            endOfLineIndex = newlineIndex
+            newlineCount = 1
+        } else if context.isEnded {
+            endOfLineIndex = data.endIndex
+            newlineCount = 0
+        } else {
             return nil
         }
 
-        let payload = data.prefix(upTo: newlineIndex)
+        let payload = data.prefix(upTo: endOfLineIndex)
         let packet = NewlinePacket(text: String(payload))
-        return PacketSearchResult(packet: packet, numberOfElementsConsumedByPacket: payload.count+1)
+        return PacketSearchResult(packet: packet, numberOfElementsConsumedByPacket: payload.count+newlineCount)
     }
 
 }

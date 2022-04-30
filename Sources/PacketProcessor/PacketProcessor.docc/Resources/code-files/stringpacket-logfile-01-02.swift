@@ -16,7 +16,7 @@ struct NewlinePacket: StringPacket {
     // Required for all Packet definitions
     static var _packetTypeId = UUID()
 
-    static func findFirstPacket(context: SwiftPacketContext, data: String) -> PacketSearchResult<Self>? {
+    static func findFirstPacket(context: PacketContext, data: String) -> PacketSearchResult<Self>? {
         // TBD
     }
 
