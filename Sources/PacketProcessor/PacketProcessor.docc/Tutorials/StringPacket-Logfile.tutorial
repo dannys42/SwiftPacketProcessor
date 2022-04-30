@@ -88,7 +88,7 @@
                 }
                 
                 @Step {
-                    To add support for end of file handling, we need to inspect ``PacketProcessor/PacketContext/isEnded`` and accept a packet even if no newline is found.
+                    To add support for end of file handling, we need to inspect ``PacketProcessor/PacketHandlerContext/isEnded`` and accept a packet even if no newline is found.
                     
                     @Code(name: "NewlinePacket.swift", file: "stringpacket-logfile-02-06")
                 } 

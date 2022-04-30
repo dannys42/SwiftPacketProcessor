@@ -32,7 +32,7 @@ class SyslogFilePacketProcessorTests: XCTestCase {
         let component: String
         let message: String
 
-        static func findFirstPacket(context: PacketContext, data: String) -> PacketSearchResult<SyslogFilePacketProcessorTests.SyslogPacket>? {
+        static func findFirstPacket(context: PacketHandlerContext, data: String) -> PacketSearchResult<SyslogFilePacketProcessorTests.SyslogPacket>? {
 
             let line: Substring
             let newlineLength: Int

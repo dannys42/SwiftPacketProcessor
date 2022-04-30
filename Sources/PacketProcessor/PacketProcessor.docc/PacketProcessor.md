@@ -19,10 +19,10 @@ where am i?
 
 - ``PacketProcessor/PacketProcessor``
 
-### Defining Packets
+### Defining & Handling Packets
 - ``DataPacket``
 - ``StringPacket``
-- ``PacketContext``
+- ``PacketHandlerContext``
 
 ### Internals
 
@@ -30,17 +30,3 @@ where am i?
 - ``Packet``
 - ``PacketCollectionType``
 
-Say something smart here!
-
-// - Example
-//
-//  ```swift
-//     struct MyPacket: DataPacket {
-//         // Packet implementation here
-//     }
-//     let packetProcessor = PacketProcessor<Data>()
-//     packetProcessor.add(MyPacket.self) { packet in
-//         // Handle packet of type `MyPacket` here.
-//     }
-//  ```
-//

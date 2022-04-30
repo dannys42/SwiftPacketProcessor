@@ -17,8 +17,8 @@ internal struct PacketTypeWrapper<CollectionType: PacketCollectionType>: Hashabl
     }
 
     let packetType: AnyPacket.Type
-    let packetGenerator: (_ context: PacketContext, _ data: CollectionType)->(packet: AnyPacket, count: Int)?
-    init(_ packetType: AnyPacket.Type, packetGenerator: @escaping (_ context: PacketContext, _ data: CollectionType)->(packet: AnyPacket, count: Int)? ) {
+    let packetGenerator: (_ context: PacketHandlerContext, _ data: CollectionType)->(packet: AnyPacket, count: Int)?
+    init(_ packetType: AnyPacket.Type, packetGenerator: @escaping (_ context: PacketHandlerContext, _ data: CollectionType)->(packet: AnyPacket, count: Int)? ) {
         self.packetType = packetType
         self.packetGenerator = packetGenerator
     }

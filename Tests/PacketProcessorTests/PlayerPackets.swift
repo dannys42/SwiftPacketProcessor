@@ -122,7 +122,7 @@ struct PlayerMovement: DataPacket, Equatable {
 
     static var _packetTypeId = UUID()
 
-    static func findFirstPacket(context: PacketContext, data: Data) -> PacketSearchResult<Self>? {
+    static func findFirstPacket(context: PacketHandlerContext, data: Data) -> PacketSearchResult<Self>? {
         guard let packet = Packet(packetType: PacketType.movement.rawValue, payloadLength: 2, payload: data) else {
             return nil
         }
@@ -167,7 +167,7 @@ struct PlayerAttack: DataPacket, Equatable {
 
     static var _packetTypeId = UUID()
 
-    static func findFirstPacket(context: PacketContext, data: Data) -> PacketSearchResult<Self>? {
+    static func findFirstPacket(context: PacketHandlerContext, data: Data) -> PacketSearchResult<Self>? {
         guard let packet = Packet(packetType: PacketType.movement.rawValue, payloadLength: 2, payload: data) else {
             return nil
         }

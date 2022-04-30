@@ -97,12 +97,13 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
     ///
     /// This is typically called like:
     ///  ```swift
-    ///  addHandler(MyPacketType.self) { packet in ...
+    ///  addHandler(MyPacketType.self) { handlerId, packet in
+    ///     ...
     ///  }
     /// ```
     ///
     /// - Note: It is safe to register multiple handlers of the same type.  Each handler each handler will receive the packet.
-    /// - Returns: An identifier that can be used to remove the handler
+    /// - Returns: An identifier that can be used to remove the handler in a call to ``remove(handlerId:)``.
     @discardableResult
     public func addHandler<P: Packet>(_ packetType: P.Type, _ handler: @escaping (PacketHandlerIdentifier,P) ->Void) -> PacketHandlerIdentifier where P.CollectionType == CollectionType {
 
@@ -127,7 +128,16 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
     /// - Parameters:
     ///   - packetType: The packet type to process.  (e.g. `MyPacket.self`)
     ///   - handler: a handler that will be called every time `packetType` is found.
-    /// - Returns: An identifier that can be used to remove the handler
+    ///
+    /// This is typically called like:
+    ///  ```swift
+    ///  addHandler(MyPacketType.self) { packet in
+    ///     ...
+    ///  }
+    /// ```
+    ///
+    /// - Note: It is safe to register multiple handlers of the same type.  Each handler each handler will receive the packet.
+    /// - Returns: An identifier that can be used to remove the handler in a call to ``remove(handlerId:)``.
     @discardableResult
     public func addHandler<P: Packet>(_ packetType: P.Type, _ handler: @escaping (P) ->Void) -> PacketHandlerIdentifier where P.CollectionType == CollectionType {
 
@@ -174,7 +184,7 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
     }
 
     /// Remove a handler
-    /// - Parameter handlerId: ``PacketHandlerIdentifier`` to remove.  This is returned when calling ``addHandler()``
+    /// - Parameter handlerId: ``PacketHandlerIdentifier`` to remove.  This is returned when calling ``addHandler(_:_:)-8hqd3`` or ``addHandler(_:_:)-86o7r``.
     public func remove(handlerId: PacketHandlerIdentifier) {
         var newHandlers: [PacketTypeWrapper<CollectionType>:[HandlerWrapper]] = [:]
         for (packetType, handlerList) in self.handlers {
@@ -189,7 +199,7 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
 
     /// Mark the end of input.  It is an error to call ``push(_:)`` after declaring end.
     ///
-    /// This will give all packet handlers another chance to process the packet (with `isEnded = true` in the `PacketContext`.  It will also clear the `PacketProcessor`'s internal data buffers.
+    /// This will give all packet handlers another chance to process the packet (with `isEnded = true` in the `PacketHandlerContext`.  It will also clear the `PacketProcessor`'s internal data buffers.
     public func end() {
         self.isEnded = true
         if self.unprocessedData.count > 0 {
@@ -225,7 +235,7 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
 
         var didPopBuffer = false
 
-        let context = PacketContext(isEnded: self.isEnded)
+        let context = PacketHandlerContext(isEnded: self.isEnded)
         for (packetTypeWrapper, handlerWrappers) in self.handlers {
             guard let packetInfo = packetTypeWrapper.packetGenerator(context, self.unprocessedData) else {
                 continue

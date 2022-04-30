@@ -10,7 +10,7 @@ import Foundation
 /// Byte-oriented packets should conform to `DataPacket`.
 /// Examples of this include IP, TCP, and UDP.
 public protocol DataPacket: Packet where CollectionType == Data {
-    static func findFirstPacket(context: PacketContext, data: Data) -> PacketSearchResult<Self>?
+    static func findFirstPacket(context: PacketHandlerContext, data: Data) -> PacketSearchResult<Self>?
 }
 
 /// Declare `Data` is a valid `PacketCollectionType`

@@ -15,7 +15,7 @@ class PartialStringPacketProcessorTests: XCTestCase {
 
         static var _packetTypeId = UUID()
 
-        static func findFirstPacket(context: PacketContext, data: String) -> PacketSearchResult<Self>? {
+        static func findFirstPacket(context: PacketHandlerContext, data: String) -> PacketSearchResult<Self>? {
             let endOfLineIndex: String.Index
             let newlineCount: Int
 

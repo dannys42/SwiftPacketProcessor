@@ -20,7 +20,7 @@ class StringPacketProcessorTests: XCTestCase {
 
         static var _packetTypeId = UUID()
 
-        static func findFirstPacket(context: PacketContext, data: String) -> PacketSearchResult<Self>? {
+        static func findFirstPacket(context: PacketHandlerContext, data: String) -> PacketSearchResult<Self>? {
             guard let newlineIndex = data.firstIndex(of: "\n") else {
                 return nil
             }
