@@ -76,7 +76,7 @@ class PacketSequenceIterator<P: AnyPacket>: AsyncSequence, AsyncIteratorProtocol
 ///
 /// Packet definitions must include rules for validating the packet and returning the number of data elements consumed by the packet. See ``DataPacket`` and ``StringPacket``.
 ///
-/// Streams can have a base ``PacketCollectionType`` type of `String` or `Data` by initializing as `PacketProcessor<String>` or `PacketProcessor<Data>`.
+/// Data streams can have a base ``PacketCollectionType`` type of `String` or `Data` by initializing as `PacketProcessor<String>` or `PacketProcessor<Data>`.
 ///
 public class PacketProcessor<CollectionType: PacketCollectionType> {
 
@@ -84,6 +84,7 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
     private var handlers: [PacketTypeWrapper<CollectionType>:[HandlerWrapper]]
     private var isEnded = false
 
+    /// ``PacketProcessor`` should be initializd as `PacketProcessor<String>` or `PacketProcessor<Data>` depending on whehter you will be ``push(_:)``ing `String` or `Data` elements, respectively.
     public init() {
         self.unprocessedData = CollectionType()
         self.handlers = [:]
