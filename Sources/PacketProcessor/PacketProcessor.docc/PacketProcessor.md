@@ -1,7 +1,5 @@
 # ``PacketProcessor``
 
-## Overview
-
 ``PacketProcessor`` takes care of buffer management when processing packetized data within streams. 
 
 ## Intro

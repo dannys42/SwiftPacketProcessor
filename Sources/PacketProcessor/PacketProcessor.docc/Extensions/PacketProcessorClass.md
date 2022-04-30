@@ -7,10 +7,15 @@
 - ``init()``
 
 ### Adding Packet Handlers
-- ``add(_:_:)``
+- ``addHandler(_:_:)-86o7r``
+- ``addHandler(_:_:)-8hqd3``
 
-### Handling new data from the data stream
+### Data from the data stream
 - ``push(_:)``
+- ``end()``
+
+## Removing Packet Handlers
+- ``remove(handlerId:)``
 
 ## See Also
 

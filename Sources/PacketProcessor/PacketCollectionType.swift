@@ -7,7 +7,9 @@
 
 import Foundation
 
-/// Protocol used to declare data collection types that can be used by `PacketProcessor`.
+/// Protocol used to declare data collection types that can be used by ``PacketProcessor``.
+///
+/// This is primarily used to initialize a ``PacketProcessor``.  You will do so by specifying either `PacketProcessor<String>` or `PacketProcessor<Data>`.
 ///
 /// Most users can ignore this protocol.
 public protocol PacketCollectionType {

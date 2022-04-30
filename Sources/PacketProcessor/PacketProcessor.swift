@@ -72,11 +72,11 @@ class PacketSequenceIterator<P: AnyPacket>: AsyncSequence, AsyncIteratorProtocol
 
 /// Provides a simple, type-safe way of handling structured packets given a data stream.
 ///
-/// `PacketProcessor` handles the details of buffer management when reading a data stream.  Callers need only push newly received data to the `PacketProcessor`.  The correct handlers for the appropriately typed packet will be called when appropriate.
+/// ``PacketProcessor`` handles the details of buffer management when reading a data stream.  Callers need only push newly received data to the ``PacketProcessor``.  The correct handlers for the appropriately typed packet will be called when appropriate.
 ///
-/// Packet definitions must include rules for validating the packet and returning the number of data elements consumed by the packet. See `DataPacket` and `StringPacket`.
+/// Packet definitions must include rules for validating the packet and returning the number of data elements consumed by the packet. See ``DataPacket`` and ``StringPacket``.
 ///
-/// Streams can have a base collection type of `String` or `Data` by initializing as `PacketProcessor<String>` or `PacketProcessor<Data>`.
+/// Streams can have a base ``PacketCollectionType`` type of `String` or `Data` by initializing as `PacketProcessor<String>` or `PacketProcessor<Data>`.
 ///
 public class PacketProcessor<CollectionType: PacketCollectionType> {
 
