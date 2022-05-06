@@ -36,11 +36,6 @@ class UTF8ToStringTests: XCTestCase {
                 func incrementEnd() -> Range {
                     return Range(startIndex: self.startIndex, endIndex: self.endIndex+1)
                 }
-                /*
-                func with(endIndex: Data.Index) -> Range {
-                    return Range(startIndex: self.startIndex, endIndex: endIndex)
-                }
-                 */
             }
             enum State {
                 case good(range: Range)
@@ -119,98 +114,6 @@ class UTF8ToStringTests: XCTestCase {
             } else {
                 return nil
             }
-
-            /*
-            var currentIndex = data.startIndex
-            while currentIndex < data.endIndex {
-                let byte = data[currentIndex]
-                let state: State
-
-                if (byte & 0b1000_0000) == 0b0000_0000 {
-                    endIndex = currentIndex
-                    currentIndex += 1
-                    state = .good
-                } else if (byte & 0b1110_0000) == 0b1100_0000 {
-                    if currentIndex+1 < data.endIndex {
-                        let byte2 = data[currentIndex+1]
-                        if (byte2 & 0b1100_0000) == 0b1000_0000 {
-                            // valid
-                            endIndex = currentIndex+1
-                            currentIndex += 2
-                            state = .good
-                        } else {
-                            // invalid
-                            state = .invalid(lastGoodIndex: currentIndex, badCount: 2)
-                        }
-                    } else {
-                        // incomplete
-                        state = .incomplete
-                    }
-                } else if (byte & 0b1111_0000) == 0b1110_0000 {
-                    if currentIndex+2 < data.endIndex {
-                        let byte2 = data[currentIndex+1]
-                        let byte3 = data[currentIndex+2]
-                        if (byte2 & 0b1100_0000) == 0b1000_0000,
-                           (byte3 & 0b1100_0000) == 0b1000_0000
-                        {
-                            // valid
-                            currentIndex += 2
-                            endIndex = currentIndex+1
-                            state = .good
-                        } else {
-                            // invalid
-                            state = .invalid(lastGoodIndex: currentIndex, badCount: 3)
-                        }
-                    } else {
-                        // incomplete
-                        state = .incomplete
-                    }
-                } else if (byte & 0b1111_1000) == 0b1111_0000 {
-                    if currentIndex+3 < data.endIndex {
-                        let byte2 = data[currentIndex+1]
-                        let byte3 = data[currentIndex+2]
-                        let byte4 = data[currentIndex+4]
-                        if (byte2 & 0b1100_0000) == 0b1000_0000,
-                           (byte3 & 0b1100_0000) == 0b1000_0000,
-                           (byte4 & 0b1100_0000) == 0b1000_0000
-                        {
-                            // valid
-                            currentIndex += 3
-                            endIndex = currentIndex+1
-                            state = .good
-                        } else {
-                            // invalid
-                            state = .invalid(lastGoodIndex: currentIndex, badCount: 4)
-                        }
-                    } else {
-                        // incomplete
-                        state = .incomplete
-                    }
-                } else {
-                    state = .invalid(lastGoodIndex: currentIndex, badCount: 1)
-                }
-
-                switch state {
-                case .good:
-                    break
-                case .incomplete:
-                    break
-                case .invalid(lastGoodIndex: let lastGoodIndex, badCount: let badCount):
-                    break
-                }
-            }
-
-            if let endIndex = endIndex {
-                let goodData = data[data.startIndex..<endIndex]
-                let string = String(data: goodData, encoding: .utf8)!
-                let packet = UTF8ToString(string: string)
-                let count = endIndex - data.startIndex + 1
-                return PacketSearchResult(packet: packet, numberOfElementsConsumedByPacket: count)
-            } else {
-                print("error: start: \(data.startIndex)  end: \(data.endIndex)  new end: \(endIndex)")
-                return nil
-            }
-             */
         }
     }
 
