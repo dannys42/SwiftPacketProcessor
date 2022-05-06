@@ -12,4 +12,8 @@
         
         @TutorialReference(tutorial: "doc:StringPacket-Logfile")
     }
+    
+    @Chapter(name: "Converting UTF8 byte streams to Strings") {
+        @TutorialReference(tutorial: "doc:DataPacket-utf8")
+    }
 }

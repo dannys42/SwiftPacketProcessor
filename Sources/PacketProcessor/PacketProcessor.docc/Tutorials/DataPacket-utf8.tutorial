@@ -1,0 +1,34 @@
+@Tutorial(time: 3) {
+    @Intro(title: "UTF8 to String") {
+        As an example, let's create a UTF-8 decoder.
+        
+        Swift already has a built-in way of converting Data to String via `String(data:utf8)`.  However, typically this is used by reading an entire file into memory before converting it to a string.  This has a few potential disadvantages:
+        
+        * High memory usage for large files
+        * Unwated latency if reading from a live stream
+        
+        So let's see what we can do to create a UTF8 to String reader.
+    }
+    
+    @Section(title: "First thing!") {
+        @ContentAndMedia {
+            something?
+            
+        }
+        
+        @Steps {
+            @Step {
+                We could start out leveraging Swift's built-in UTF-8 conversion function
+                `String(data:utf8)`.  However, we need to do a bit more to handle errors properly.  In addition, if an UTF-8 character is split (e.g. due to a chunking boundary) this would require waiting for the next chunk of data to process the data correctly.  If we again break-up a UTF-8 character, we could delay again, leading to a situation where we never return a readable string to the packet handler.
+                
+                
+                @Code(name: "UTF8ToString.swift", file: "datapacket-utf8-01-01")
+            }
+            
+            @Step {
+                Sstep 2 
+                
+            }
+        }
+    }
+}
