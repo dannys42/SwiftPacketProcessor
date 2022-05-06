@@ -70,6 +70,10 @@ class UTF8ToStringTests: XCTestCase {
                         nextState = .partial(goodRange: range, partialRange: .init(index: nextIndex), count: 2)
                     } else if (byte & 0b1111_1000) == 0b1111_0000 {
                         nextState = .partial(goodRange: range, partialRange: .init(index: nextIndex), count: 3)
+                    } else if (byte & 0b1111_1100) == 0b1111_1000 {
+                        nextState = .partial(goodRange: range, partialRange: .init(index: nextIndex), count: 4)
+                    } else if (byte & 0b1111_1110) == 0b1111_1100 {
+                        nextState = .partial(goodRange: range, partialRange: .init(index: nextIndex), count: 5)
                     } else {
                         let goodData = data[range.startIndex..<range.endIndex]
                         string.append(String(data: goodData, encoding: .utf8)!)
@@ -165,6 +169,63 @@ class UTF8ToStringTests: XCTestCase {
 
         XCTAssertEqual(expectedValue, observedValue)
     }
+
+    func testThat_InvalidUTF8_OnByte2_AddsError() {
+        let inputValue = Data([0x48, 0x65, 0x6c, 0x6c, 0x6f, 0b1110_1111, 0x80, 0xff])
+        let expectedValue: String = "Hello�"
+        var observedValue: String?
+
+        self.packetProcessor.addHandler(UTF8ToString.self) { packet in
+            let oldValue = observedValue ?? ""
+            observedValue = oldValue.appending(packet.string)
+        }
+        self.packetProcessor.push(inputValue)
+
+        XCTAssertEqual(expectedValue, observedValue)
+    }
+
+    func testThat_InvalidUTF8_OnByte3_AddsError() {
+        let inputValue = Data([0x48, 0x65, 0x6c, 0x6c, 0x6f, 0b1111_0111, 0x80, 0x80, 0xff])
+        let expectedValue: String = "Hello�"
+        var observedValue: String?
+
+        self.packetProcessor.addHandler(UTF8ToString.self) { packet in
+            let oldValue = observedValue ?? ""
+            observedValue = oldValue.appending(packet.string)
+        }
+        self.packetProcessor.push(inputValue)
+
+        XCTAssertEqual(expectedValue, observedValue)
+    }
+
+    func testThat_InvalidUTF8_OnByte4_AddsError() {
+        let inputValue = Data([0x48, 0x65, 0x6c, 0x6c, 0x6f, 0b1111_1011, 0x80, 0x80, 0x80, 0xff])
+        let expectedValue: String = "Hello�"
+        var observedValue: String?
+
+        self.packetProcessor.addHandler(UTF8ToString.self) { packet in
+            let oldValue = observedValue ?? ""
+            observedValue = oldValue.appending(packet.string)
+        }
+        self.packetProcessor.push(inputValue)
+
+        XCTAssertEqual(expectedValue, observedValue)
+    }
+
+    func testThat_InvalidUTF8_OnByte5_AddsError() {
+        let inputValue = Data([0x48, 0x65, 0x6c, 0x6c, 0x6f, 0b1111_1101, 0x80, 0x80, 0x80, 0x80, 0xff])
+        let expectedValue: String = "Hello�"
+        var observedValue: String?
+
+        self.packetProcessor.addHandler(UTF8ToString.self) { packet in
+            let oldValue = observedValue ?? ""
+            observedValue = oldValue.appending(packet.string)
+        }
+        self.packetProcessor.push(inputValue)
+
+        XCTAssertEqual(expectedValue, observedValue)
+    }
+
 
     func testThat_4byte_UTF8_Converts() {
         let inputValue = Data([0x48, 0x65, 0x6c, 0x6c, 0x6f, 0x20, 0xf0, 0x9f, 0x8c, 0x8e])
