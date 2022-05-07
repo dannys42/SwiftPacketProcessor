@@ -14,6 +14,7 @@ Defines a new PacketProcessor to convert data streams to type-safe packets.
 
 import Foundation
 
+/*
 public
 actor PacketSequenceIterator<P: AnyPacket>: AsyncSequence, AsyncIteratorProtocol {
     public typealias Element = P
@@ -49,6 +50,7 @@ actor PacketSequenceIterator<P: AnyPacket>: AsyncSequence, AsyncIteratorProtocol
     }
 
 }
+*/
 
 
 /// Provides a simple, type-safe way of handling structured packets given a data stream.
@@ -128,6 +130,7 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
         }
     }
 
+    /*
     public func handle<P: Packet>(_ packetType: P.Type) -> PacketSequenceIterator<P> where P.CollectionType == CollectionType {
         let iterator = PacketSequenceIterator(type: P.self)
 
@@ -139,6 +142,7 @@ public class PacketProcessor<CollectionType: PacketCollectionType> {
 
         return iterator
     }
+     */
 
     /// Call when more data in the stream is received.
     /// - Parameter data: The new data received

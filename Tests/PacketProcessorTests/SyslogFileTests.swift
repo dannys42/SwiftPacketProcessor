@@ -198,6 +198,7 @@ class SyslogFilePacketProcessorTests: XCTestCase {
         XCTAssertEqual(expectedValue, observedValue)
     }
 
+    /*
     func testThat_AsyncHandle_CanReadCorrectNumberOfLines() async throws {
         let expectedValue = 0
         let observedValue: Int
@@ -234,6 +235,7 @@ class SyslogFilePacketProcessorTests: XCTestCase {
 
         XCTAssertEqual(expectedValue, observedValue)
     }
+     */
 }
 
 
