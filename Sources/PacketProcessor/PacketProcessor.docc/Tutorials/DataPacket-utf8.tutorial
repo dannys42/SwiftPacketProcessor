@@ -53,6 +53,18 @@
                 @Code(name: "UTF8ToString.swift", file: "datapacket-utf8-02-03")
             }
             
+            @Step {
+                Next we must ensure we properly handle "end" conditions correctly if we're expecting more information.
+                
+                @Code(name: "UTF8ToString.swift", file: "datapacket-utf8-02-04")
+            }
+            
+            @Step {
+                Finally we return the packet as well as the number of bytes consumed.
+                
+                @Code(name: "UTF8ToString.swift", file: "datapacket-utf8-02-05")
+            }
+
         }
         
     }

@@ -22,7 +22,7 @@ class UTF8ToStringTests: XCTestCase {
             var string = ""
 
             /// The last `Data.Index` that was converted to string
-            var lastGoodIndex: Data.Index!
+            var lastConsumedIndex: Data.Index!
 
             /// Invalid bytes found will generate a UTF-8 Replacement character
             let invalidCharacter = "�"
@@ -126,11 +126,16 @@ class UTF8ToStringTests: XCTestCase {
                         nextState = .good(range: .init(index: partialRange.endIndex+1))
                     }
                 case .incomplete(lastGoodIndex: let index):
-                    lastGoodIndex = index
+                    if context.isEnded {
+                        string.append(invalidCharacter)
+                        lastConsumedIndex = data.endIndex
+                    } else {
+                        lastConsumedIndex = index
+                    }
                     nextState = state
                     isDone = true
                 case .done(lastGoodIndex: let index):
-                    lastGoodIndex = index
+                    lastConsumedIndex = index
                     nextState = state
                     isDone = true
                 }
@@ -139,7 +144,7 @@ class UTF8ToStringTests: XCTestCase {
 
             if string.count > 0 {
                 let packet = UTF8ToString(string: string)
-                let numberOfBytes = lastGoodIndex - data.startIndex
+                let numberOfBytes = lastConsumedIndex - data.startIndex
                 return PacketSearchResult(packet: packet,
                                           numberOfElementsConsumedByPacket: numberOfBytes)
             } else {
@@ -330,6 +335,55 @@ class UTF8ToStringTests: XCTestCase {
             observedValue = oldValue.appending(packet.string)
         }
         self.packetProcessor.push(inputValue)
+
+        XCTAssertEqual(expectedValue, observedValue)
+    }
+
+    func testThat_PartialBytes_WillConvertWhenComplete() {
+        let inputValue = [
+            Data([0x48, 0x65, 0x6c, 0x6c, 0x6f]), // "Hello"
+
+            Data([0xf0]),
+            Data([0x9f]),
+            Data([0x8c]),
+            Data([0x8e]), // 🌎
+        ]
+        let expectedValue: String = "Hello🌎"
+        var observedValue: String?
+
+        self.packetProcessor.addHandler(UTF8ToString.self) { packet in
+            let oldValue = observedValue ?? ""
+            observedValue = oldValue.appending(packet.string)
+        }
+
+        for data in inputValue {
+            self.packetProcessor.push(data)
+        }
+
+        XCTAssertEqual(expectedValue, observedValue)
+    }
+
+    func testThat_PartialBytesAtEnd_WillConvertToError() {
+        let inputValue = [
+            Data([0x48, 0x65, 0x6c, 0x6c, 0x6f]), // "Hello"
+
+            Data([0xf0]),
+            Data([0x9f]),
+            Data([0x8c]),
+            // Data([0x8e]), // 🌎  <-- specifically missing this last byte
+        ]
+        let expectedValue: String = "Hello�"
+        var observedValue: String?
+
+        self.packetProcessor.addHandler(UTF8ToString.self) { packet in
+            let oldValue = observedValue ?? ""
+            observedValue = oldValue.appending(packet.string)
+        }
+
+        for data in inputValue {
+            self.packetProcessor.push(data)
+        }
+        self.packetProcessor.end()
 
         XCTAssertEqual(expectedValue, observedValue)
     }

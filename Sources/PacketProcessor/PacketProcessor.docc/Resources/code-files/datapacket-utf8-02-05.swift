@@ -43,7 +43,6 @@ struct UTF8ToString: DataPacket {
                 return Range(startIndex: self.startIndex, endIndex: self.endIndex+1)
             }
         }
-
         enum State {
             /// range keeps track of a run of "good" bytes that can be converted and appended to ``string``
             case good(range: Range)
@@ -105,7 +104,7 @@ struct UTF8ToString: DataPacket {
                 // - Handle invalid characters
                 // - Go to `incomplete` state if we have fewer bytes than expected
                 // - Go to `good` state if we've validated all the bytes of the multi-byte character
-                
+
                 guard count > 0 else {
                     nextState = .good(range: Range(startIndex: goodRange.startIndex, endIndex: partialRange.endIndex))
                     break
@@ -124,7 +123,12 @@ struct UTF8ToString: DataPacket {
                     nextState = .good(range: .init(index: partialRange.endIndex+1))
                 }
             case .incomplete(lastGoodIndex: let index):
-                lastConsumedIndex = index
+                if context.isEnded {
+                    string.append(invalidCharacter)
+                    lastConsumedIndex = data.endIndex
+                } else {
+                    lastConsumedIndex = index
+                }
                 nextState = state
                 isDone = true
             case .done(lastGoodIndex: let index):
@@ -135,7 +139,13 @@ struct UTF8ToString: DataPacket {
             state = nextState
         }
 
-        /// TBD
-        return nil
+        if string.count > 0 {
+            let packet = UTF8ToString(string: string)
+            let numberOfBytes = lastConsumedIndex - data.startIndex
+            return PacketSearchResult(packet: packet,
+                                      numberOfElementsConsumedByPacket: numberOfBytes)
+        } else {
+            return nil
+        }
     }
 }

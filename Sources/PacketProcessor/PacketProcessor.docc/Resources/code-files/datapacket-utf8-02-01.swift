@@ -7,7 +7,6 @@ A simple UTF-8 decoder
 Created by Danny Sung on 05/05/2022.
 */
 
-
 import Foundation
 
 struct UTF8ToString: DataPacket {
@@ -20,7 +19,7 @@ struct UTF8ToString: DataPacket {
         var string = ""
 
         /// The last `Data.Index` that was converted to string
-        var lastGoodIndex: Data.Index!
+        var lastConsumedIndex: Data.Index!
 
         /// Invalid bytes found will generate a UTF-8 Replacement character
         let invalidCharacter = "�"
