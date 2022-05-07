@@ -16,6 +16,10 @@ struct UTF8ToString: DataPacket {
     static var _packetTypeId = UUID()
 
     static func findFirstPacket(context: PacketHandlerContext, data: Data) -> PacketSearchResult<UTF8ToString>? {
-        // TBD
+        guard let string = String(data: data, encoding: .utf8) else {
+            return nil
+        }
+        let packet = UTF8ToString(string: string)
+        return PacketSearchResult(packet: packet, numberOfElementsConsumedByPacket: data.count)
     }
 }

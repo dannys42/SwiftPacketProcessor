@@ -14,11 +14,20 @@ class UTF8ToStringTests: XCTestCase {
 
     struct UTF8ToString: DataPacket {
         var string: String
+
         static var _packetTypeId = UUID()
+        
         static func findFirstPacket(context: PacketHandlerContext, data: Data) -> PacketSearchResult<UTF8ToString>? {
+            /// A buffer to append valid converted `String`s until we're ready to return
             var string = ""
+
+            /// The last `Data.Index` that was converted to string
             var lastGoodIndex: Data.Index!
 
+            /// Invalid bytes found will generate a UTF-8 Replacement character
+            let invalidCharacter = "�"
+
+            /// A container to keep track of a range of indexes into `Data`
             struct Range {
                 let startIndex: Data.Index
                 let endIndex: Data.Index
@@ -38,20 +47,32 @@ class UTF8ToStringTests: XCTestCase {
                 }
             }
             enum State {
+                /// range keeps track of a run of "good" bytes that can be converted and appended to ``string``
                 case good(range: Range)
+
+                /// goodRange is the last "good" range that has not yet been appended to ``string``.
+                /// partialRange keeps track of the start and current index of a multi-byte character
                 case partial(goodRange: Range, partialRange: Range, count: Int)
+
+                /// an exit condition if we were expecting more bytes in a multi-byte character, but ran out
                 case incomplete(lastGoodIndex: Data.Index)
+
+                /// an exit condition when everything has been properly converted
                 case done(lastGoodIndex: Data.Index)
             }
 
             var state = State.good(range: .init(index: data.startIndex))
-            let invalidCharacter = "�"
             var isDone = false
 
             while !isDone {
                 let nextState: State
                 switch state {
                 case .good(range: let range):
+                    // The logic here is:
+                    // - Extend the range while we have valid bytes
+                    // - Handle invalid characters
+                    // - Move to the `partial` state when we detect a multi-byte character
+                    // - Convert validated bytes if we reach the end of the buffer
                     guard range.endIndex < data.endIndex else {
                         if range.startIndex < range.endIndex {
                             let goodData = data[range.startIndex..<data.endIndex]
@@ -81,6 +102,12 @@ class UTF8ToStringTests: XCTestCase {
                         nextState = .good(range: .init(index: nextIndex))
                     }
                 case .partial(goodRange: let goodRange, partialRange: let partialRange, count: let count):
+                    // The logic here is:
+                    // - Validate each byte in a multi-byte character
+                    // - Handle invalid characters
+                    // - Go to `incomplete` state if we have fewer bytes than expected
+                    // - Go to `good` state if we've validated all the bytes of the multi-byte character
+
                     guard count > 0 else {
                         nextState = .good(range: Range(startIndex: goodRange.startIndex, endIndex: partialRange.endIndex))
                         break

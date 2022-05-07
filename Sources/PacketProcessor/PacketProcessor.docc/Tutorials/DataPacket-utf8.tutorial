@@ -1,34 +1,59 @@
 @Tutorial(time: 3) {
-    @Intro(title: "UTF8 to String") {
-        As an example, let's create a UTF-8 decoder.
+    @Intro(title: "UTF-8 to String Converter") {
+        The standard approach to UTF-8 conversion is to load all UTF-8 data into a `Data()` object, then convert to a `String` using `String(data:utf8)`.  While this works, it can be problematic in a couple areas:
         
-        Swift already has a built-in way of converting Data to String via `String(data:utf8)`.  However, typically this is used by reading an entire file into memory before converting it to a string.  This has a few potential disadvantages:
-        
-        * High memory usage for large files
-        * Unwated latency if reading from a live stream
-        
-        So let's see what we can do to create a UTF8 to String reader.
+        * High Memory - If loading from a very large file, this could take a lot of memory and time before being able to render anything on-screen.
+        * Latency - If reading a stream of bytes from a network socket, there may be occasions where you want to render partial data to the screen without having to wait until the full content is loaded.
+ 
+        While we'll still rely on Swift's built-in `String(data:utf8)` function, using the packet processor will resolve these issues by allowing us to convert any valid data we have to strings and render it on-the-fly with much lower memory and latency.
     }
     
-    @Section(title: "First thing!") {
+    @Section(title: "The naive way") {
         @ContentAndMedia {
-            something?
             
         }
         
         @Steps {
             @Step {
-                We could start out leveraging Swift's built-in UTF-8 conversion function
-                `String(data:utf8)`.  However, we need to do a bit more to handle errors properly.  In addition, if an UTF-8 character is split (e.g. due to a chunking boundary) this would require waiting for the next chunk of data to process the data correctly.  If we again break-up a UTF-8 character, we could delay again, leading to a situation where we never return a readable string to the packet handler.
-                
+                We start out by defining `UTF8ToString` as a ``PacketProcessor/DataPacket``, since we are expecting to push blocks of `Data` into the ``PacketProcessor/PacketProcessor``.
                 
                 @Code(name: "UTF8ToString.swift", file: "datapacket-utf8-01-01")
             }
+            @Step {
+                Simply passing the `Data` into `String(data:utf8)` does not work since UTF-8 has variable-length characters.  If `Data` has split any of the characters, then `String(data:utf8)` will return nil and no conversion will happen.
+                
+                Clearly we need to do more in order to properly process UTF-8.
+                
+                @Code(name: "UTF8ToString.swift", file: "datapacket-utf8-01-02")
+            }
+            
+        }
+    }
+    
+    @Section(title: "Processing a stream") {
+        @ContentAndMedia {
+            A more complete implementation.  We'll still rely on `String(data:utf8)` to do the heavy lifting of actually converting UTF-8 to Strings, however we need to do some bookkeeping to ensure we handle partial data appropriately.
+        }
+        @Steps {
+            @Step {
+                We start by creating some book keeping variables.  `Range` will be used to keep track of range of `Data.Index`es.
+                
+                @Code(name: "UTF8ToString.swift", file: "datapacket-utf8-02-01")
+            }
             
             @Step {
-                Sstep 2 
+                We'll be creating a state machine, so let's define a few states.
                 
+                @Code(name: "UTF8ToString.swift", file: "datapacket-utf8-02-02")
             }
+
+            @Step {
+                Create the state machine.
+                
+                @Code(name: "UTF8ToString.swift", file: "datapacket-utf8-02-03")
+            }
+            
         }
+        
     }
 }
