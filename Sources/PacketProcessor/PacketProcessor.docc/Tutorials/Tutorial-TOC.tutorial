@@ -13,7 +13,15 @@
         @TutorialReference(tutorial: "doc:StringPacket-Logfile")
     }
     
-    @Chapter(name: "Converting UTF8 byte streams to Strings") {
+    @Chapter(name: "Processing messages from sockets") {
+        This example demonstrates how we might handle JSON messages from web sockets.
+        
+        @TutorialReference(tutorial: "doc:StringPacket-JSON")
+    }
+    
+    @Chapter(name: "Converting UTF-8 byte streams to Strings") {
+        An example working with variable length byte streams.
+        
         @TutorialReference(tutorial: "doc:DataPacket-utf8")
     }
 }

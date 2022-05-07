@@ -1,4 +1,4 @@
-@Tutorial(time: 3) {
+@Tutorial(time: 15) {
     @Intro(title: "UTF-8 to String Converter") {
         The standard approach to UTF-8 conversion is to load all UTF-8 data into a `Data()` object, then convert to a `String` using `String(data:utf8)`.  While this works, it can be problematic in a couple areas:
         

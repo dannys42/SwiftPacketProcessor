@@ -1,0 +1,15 @@
+{
+    "playerId": 1,
+    "move": {
+        "x" : 3,
+        "y" : 2
+}
+
+{
+    "playerId": 1,
+    "attack": {
+        "x" : 7,
+        "y" : 9
+    },
+    "weapon": "cannon"
+}

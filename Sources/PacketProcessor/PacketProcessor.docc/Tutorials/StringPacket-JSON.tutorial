@@ -1,0 +1,66 @@
+@Tutorial(time: 10) {
+    @Intro(title: "Reading JSON packets from a socket") {
+        This example demonstrates how we can use ``PacketProcessor`` to manage different JSON packets read from a socket.
+        
+    }
+    
+    @Section(title: "WebSocket") {
+        @ContentAndMedia {
+            Since WebSockets are gauranteed to include the entire message upon read, very little is needed to support them.
+        }
+        
+        @Steps {
+            @Step {
+               Suppose we have the following JSON objects coming in from a streasm
+                
+                @Code(name: "packets.json", file: "stringpacket-json-01-01")
+            }
+            
+            @Step {
+                We start out defining our structs.
+                
+                @Code(name: "jsonpacket.swift", file: "stringpacket-json-01-02")
+            }
+            
+            @Step {
+                In the case of WebSockets, we can make due without ``PacketProcessor`` by simply attempting to decode our packets in turn.
+                
+                @Code(name: "jsonpacket.swift", file: "stringpacket-json-01-03")
+            }       
+            
+            @Step {
+                Alternatively we could use ``PacketProcessor``.
+                
+                @Code(name: "jsonpacket.swift", file: "stringpacket-json-01-04")
+            }       
+
+        }
+    }
+        
+    @Section(title: "Raw sockets") {
+        @ContentAndMedia {
+            Raw sockets can be a little trickier to work with since messages can be split anywhere.  This is where ``PacketProcessor`` can help simplify things a little.
+        }
+        
+        @Steps {
+            @Step {
+                First we need a way to buffer and split messages at the JSON message boundary.  This is a simple state machine that does just that.  It assumes every message is a dictionary.
+                
+                @Code(name: "jsonpacket.swift", file: "stringpacket-json-02-01")
+            }       
+            
+            @Step {
+                Once we have that, we're back in a similar situation as the WebSocket.  We can decode the JSON messages directly.
+                
+                @Code(name: "jsonpacket.swift", file: "stringpacket-json-02-02")
+            }
+            
+            @Step {
+                Or we can define each JSON object as their own ``DataPacket`` and handle it with a two-stage ``PacketProcessor/PacketProcessor``.
+                
+                @Code(name: "jsonpacket.swift", file: "stringpacket-json-02-03")
+            }
+            
+        }
+    }
+}
