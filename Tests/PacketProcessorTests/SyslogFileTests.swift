@@ -197,7 +197,43 @@ class SyslogFilePacketProcessorTests: XCTestCase {
         // Ensure output is what we expect
         XCTAssertEqual(expectedValue, observedValue)
     }
-    
+
+    func testThat_AsyncHandle_CanReadCorrectNumberOfLines() async throws {
+        let expectedValue = 0
+        let observedValue: Int
+        let g = DispatchGroup()
+        actor Counter {
+            var count = 0
+
+            func increment() {
+                self.count += 1
+            }
+        }
+        let counter = Counter()
+
+        g.enter()
+        Task {
+            defer { g.leave() }
+
+            for try await line in self.packetProcessor.handle(SyslogPacket.self) {
+                print("line: \(line)")
+                await counter.increment()
+            }
+        }
+
+        g.enter()
+        Task {
+            defer { g.leave() }
+
+            self.feedPacketProcessor()
+        }
+
+        g.wait()
+
+        observedValue = await counter.count
+
+        XCTAssertEqual(expectedValue, observedValue)
+    }
 }
 
 

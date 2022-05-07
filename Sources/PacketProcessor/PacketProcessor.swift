@@ -15,53 +15,33 @@ Defines a new PacketProcessor to convert data streams to type-safe packets.
 import Foundation
 
 public
-class PacketSequenceIterator<P: AnyPacket>: AsyncSequence, AsyncIteratorProtocol {
+actor PacketSequenceIterator<P: AnyPacket>: AsyncSequence, AsyncIteratorProtocol {
     public typealias Element = P
     private var isCancelled = false
-    actor Coordinator {
-        private var isCancelled = false
-        private var nextElement: P?
-
-        func cancel() {
-            self.isCancelled = true
-        }
-
-        func push(_ value: P) {
-            self.nextElement = value
-        }
-
-        public func next() async throws -> Element? {
-            return await withCheckedContinuation { continuation in
-                if self.isCancelled {
-                    continuation.resume(returning: nil)
-                    return
-                }
-
-                let nextElement = self.nextElement
-                self.nextElement = nil
-                continuation.resume(returning: nextElement)
-            }
-        }
-    }
-    private var coordinator: Coordinator
+    private var nextElement: P?
 
     init(type: P.Type) {
-        self.coordinator = Coordinator()
     }
 
     deinit {
-        Task {
-            await self.coordinator.cancel()
-        }
-
+        self.isCancelled = true
     }
 
     func push(_ value: P) async {
-        await self.coordinator.push(value)
+        self.nextElement = value
     }
 
     public func next() async throws -> Element? {
-        return try await self.coordinator.next()
+        return await withCheckedContinuation { continuation in
+            if self.isCancelled {
+                continuation.resume(returning: nil)
+                return
+            }
+
+            let nextElement = self.nextElement
+            self.nextElement = nil
+            continuation.resume(returning: nextElement)
+        }
     }
 
     nonisolated public func makeAsyncIterator() -> PacketSequenceIterator {
@@ -69,6 +49,7 @@ class PacketSequenceIterator<P: AnyPacket>: AsyncSequence, AsyncIteratorProtocol
     }
 
 }
+
 
 /// Provides a simple, type-safe way of handling structured packets given a data stream.
 ///
