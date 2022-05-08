@@ -18,7 +18,7 @@ Streams can have a base collection type of `String` or `Data` by initializing as
 ## Installation
 
 ### Swift Package Manager
-Add the `PacketProcessor ` package to the dependencies within your application's `Package.swift` file.  Substitute "x.y.z" with the [latest PacketProcessor release](https://github.com/dannys42/PacketProcessor/releases).
+Add the `PacketProcessor ` package to the dependencies within your application's `Package.swift` file.  Substitute "x.y.z" with the [latest PacketProcessor release](https://github.com/dannys42/SwiftPacketProcessor/releases).
 
 ```swift
 .package(url: "https://github.com/dannys42/SwiftPacketProcessor", from: "x.y.z")
