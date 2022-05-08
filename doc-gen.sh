@@ -16,3 +16,5 @@ $(xcrun --find docc) process-archive \
     --output-path "${OUTPUT_DIR}" \
     --hosting-base-path "${BASE_URL}"
 
+mv docs/index.html ${DERIVED_DATA_DIR}/index.html
+cat ${DERIVED_DATA_DIR}/index.html | sed 's/"\//"\/SwiftPacketProcessor\//g' > docs/index.html
