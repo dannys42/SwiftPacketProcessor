@@ -2,6 +2,8 @@
     @Intro(title: "Line oriented String Packets") {
         A simple variable-length packet for reading lines of text (e.g. from log files).
         
+        By implementing this, you will have a simple way to process text one line at a time.  This can be used on very large files while maintaining a fairly low memory footprint.
+
 <!--        @Image(source: <#file#>, alt: "<#accessible description#>")-->
     }
     

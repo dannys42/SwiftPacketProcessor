@@ -1,6 +1,6 @@
 @Tutorial(time: 10) {
     @Intro(title: "Reading JSON packets from a socket") {
-        This example demonstrates how we can use ``PacketProcessor`` to manage different JSON packets read from a socket.
+        This example demonstrates how we can use ``PacketProcessor`` to manage different JSON packets read from a WebSocket or raw socket.
         
     }
     

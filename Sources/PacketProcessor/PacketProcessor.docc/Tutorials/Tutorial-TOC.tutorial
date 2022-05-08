@@ -1,5 +1,5 @@
 @Tutorials(name: "Tutorials") {
-    @Intro(title: "String Oriented Packets") {
+    @Intro(title: "Examples Packets") {
        ``PacketProcessor`` can help you to easily convert a stream of characters to structured data packets.
         
 <!--        @Image(source: <#file#>, alt: "<#accessible description#>")-->
