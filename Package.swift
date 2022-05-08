@@ -1,11 +1,11 @@
-// swift-tools-version: 5.6
+// swift-tools-version: 5.5
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
 
 let package = Package(
     name: "PacketProcessor",
-    platforms: [.macOS(.v10_15)],
+    platforms: [.macOS(.v10_10), .iOS(.v10), .watchOS(.v2), .tvOS(.v9)],
     products: [
         // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(

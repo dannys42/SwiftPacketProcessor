@@ -7,6 +7,7 @@
 
 import Foundation
 
+#if false
 class SerialTask {
     private let opQ: OperationQueue
     private let serialTaskOp: SerialTaskOp
@@ -69,3 +70,5 @@ class SerialTaskOp: Operation {
         }
     }
 }
+#endif
+
