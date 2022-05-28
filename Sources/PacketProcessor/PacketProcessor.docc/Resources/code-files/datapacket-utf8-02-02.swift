@@ -12,8 +12,6 @@ import Foundation
 struct UTF8ToString: DataPacket {
     var string: String
 
-    static var _packetTypeId = UUID()
-
     static func findFirstPacket(context: PacketHandlerContext, data: Data) -> PacketSearchResult<UTF8ToString>? {
         /// A buffer to append valid converted `String`s until we're ready to return
         var string = ""

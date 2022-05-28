@@ -10,15 +10,9 @@ import Foundation
 /// A type-erased `Packet`.
 /// - Note: Primarily used internally; most callers can ignore this.
 public protocol AnyPacket {
-    static var _packetTypeId: UUID { get }
 }
 
 /// A generic `Packet` type that allows the choice between different `CollectionType`s (either `Data` or `String`)
-///
-/// ``Packet`` Implementations must also include the following lines:
-/// ```swift
-///    static var _packetTypeId = UUID()
-/// ```
 ///
 /// - Note: Primarily used internally; most callers can ignore this.
 public protocol Packet: AnyPacket {

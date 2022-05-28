@@ -18,8 +18,6 @@ class StringPacketProcessorTests: XCTestCase {
     struct NewlinePacket: StringPacket {
         var text: String
 
-        static var _packetTypeId = UUID()
-
         static func findFirstPacket(context: PacketHandlerContext, data: String) -> PacketSearchResult<Self>? {
             guard let newlineIndex = data.firstIndex(of: "\n") else {
                 return nil

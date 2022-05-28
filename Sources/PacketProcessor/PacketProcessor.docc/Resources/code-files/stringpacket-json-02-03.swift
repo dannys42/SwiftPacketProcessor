@@ -12,7 +12,6 @@ import Foundation
 struct JSONPacket: StringPacket {
     var value: String
 
-    static var _packetTypeId = UUID()
     static func findFirstPacket(context: PacketHandlerContext, data: String) -> PacketSearchResult<JSONPacketTests.JSONPacket>? {
 
         var objectLevel = 0
@@ -79,7 +78,6 @@ struct PlayerMove: Codable, DataPacket {
     let playerId: Int
     let move: Coordinates
 
-    static var _packetTypeId = UUID()
     static func findFirstPacket(context: PacketHandlerContext, data: Data) -> PacketSearchResult<JSONPacketTests.PlayerMovePacket>? {
 
         let decoder = JSONDecoder()
@@ -96,7 +94,6 @@ struct PlayerAttack: Codable, DataPacket {
     let attack: Coordinates
     let weapon: String
 
-    static var _packetTypeId = UUID()
     static func findFirstPacket(context: PacketHandlerContext, data: Data) -> PacketSearchResult<JSONPacketTests.PlayerAttackPacket>? {
 
         let decoder = JSONDecoder()

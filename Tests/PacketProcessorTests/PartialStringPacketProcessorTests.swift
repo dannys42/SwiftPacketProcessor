@@ -13,8 +13,6 @@ class PartialStringPacketProcessorTests: XCTestCase {
     struct NewlinePacket: StringPacket {
         var text: String
 
-        static var _packetTypeId = UUID()
-
         static func findFirstPacket(context: PacketHandlerContext, data: String) -> PacketSearchResult<Self>? {
             let endOfLineIndex: String.Index
             let newlineCount: Int

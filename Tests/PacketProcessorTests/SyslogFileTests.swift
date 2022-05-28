@@ -95,7 +95,6 @@ class SyslogFilePacketProcessorTests: XCTestCase {
             return PacketSearchResult(packet: packet,
                                       numberOfElementsConsumedByPacket: line.count+newlineLength)
         }
-        static var _packetTypeId = UUID()
     }
 
     override func setUp() {

@@ -13,7 +13,7 @@ internal struct PacketTypeWrapper<CollectionType: PacketCollectionType>: Hashabl
     }
     func hash(into hasher: inout Hasher) {
         hasher.combine("\(self.packetType)")
-        hasher.combine(self.packetType._packetTypeId)
+        hasher.combine(ObjectIdentifier(self.packetType))
     }
 
     let packetType: AnyPacket.Type

@@ -13,9 +13,6 @@ import PacketProcessor
 struct NewlinePacket: StringPacket {
     var text: String
 
-    // Required for all Packet definitions
-    static var _packetTypeId = UUID()
-
     static func findFirstPacket(context: PacketContext, data: String) -> PacketSearchResult<Self>? {
         // TBD
     }

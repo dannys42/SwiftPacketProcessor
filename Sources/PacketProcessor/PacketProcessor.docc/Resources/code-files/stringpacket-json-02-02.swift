@@ -12,7 +12,6 @@ import Foundation
 struct JSONPacket: StringPacket {
     var value: String
 
-    static var _packetTypeId = UUID()
     static func findFirstPacket(context: PacketHandlerContext, data: String) -> PacketSearchResult<JSONPacketTests.JSONPacket>? {
 
         var objectLevel = 0
